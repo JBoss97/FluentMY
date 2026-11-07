@@ -1,0 +1,1278 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WebOptimizer.Core</name>
+    </assembly>
+    <members>
+        <member name="M:WebOptimizer.Asset.TryAddSourceFile(System.String)">
+            <summary>
+            Adds a source file to the asset
+            </summary>
+            <param name="route">Relative path of a source file</param>
+        </member>
+        <member name="T:WebOptimizer.AssetExtensions">
+            <summary>
+            Extension methods for <see cref="T:WebOptimizer.IAssetPipeline"/>.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.AssetExtensions.GetFileProvider(WebOptimizer.IAsset,Microsoft.AspNetCore.Hosting.IWebHostEnvironment)">
+            <summary>
+            Gets the file provider.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.AssetExtensions.GetAssetFileProvider(WebOptimizer.IAsset,Microsoft.AspNetCore.Hosting.IWebHostEnvironment)">
+            <summary>
+            Gets the asset file provider. This method works for _content locations in RCL projects.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.AssetExtensions.ExcludeFiles(WebOptimizer.IAsset,System.String[])">
+            <summary>
+            Adds a file name pattern for files that should be excluded from the results
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.AssetExtensions.GetFileProvider(WebOptimizer.IAsset,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,System.String,System.String@)">
+            <summary>
+            Gets the file provider.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.AssetExtensions.GetAllFiles(Microsoft.Extensions.FileProviders.IFileProvider,System.String)">
+            <summary>
+            Returns all files from the file provider, beginning with <paramref name="start"/>
+            </summary>
+            <param name="provider"></param>
+            <param name="start"></param>
+            <returns></returns>
+        </member>
+        <member name="T:WebOptimizer.AssetBuilder">
+            <summary>
+            A class for building assets.
+            </summary>
+            <seealso cref="T:WebOptimizer.IAssetBuilder" />
+        </member>
+        <member name="M:WebOptimizer.AssetBuilder.#ctor(Microsoft.Extensions.Caching.Memory.IMemoryCache,WebOptimizer.IAssetResponseStore,Microsoft.Extensions.Logging.ILogger{WebOptimizer.AssetBuilder},Microsoft.AspNetCore.Hosting.IWebHostEnvironment)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WebOptimizer.AssetBuilder"/> class.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.AssetBuilder.BuildAsync(WebOptimizer.IAsset,Microsoft.AspNetCore.Http.HttpContext,WebOptimizer.IWebOptimizerOptions)">
+            <summary>
+            Builds an asset by running it through all the processors.
+            </summary>
+        </member>
+        <member name="F:WebOptimizer.AssetPipeline._assetLogger">
+            <summary>
+            For use by the Asset constructor only. Do not use for logging messages inside <see cref="T:WebOptimizer.AssetPipeline"/>.
+            </summary>
+        </member>
+        <member name="T:WebOptimizer.ByteExtensions">
+            <summary>
+            Extension methods for making it easier to work with streams.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.ByteExtensions.AsString(System.Byte[])">
+            <summary>
+            Converts the byte array to a string
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.ByteExtensions.AsByteArray(System.String)">
+            <summary>
+            Converts a string into a byte array.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.ByteExtensions.AsBytesAsync(System.IO.Stream)">
+            <summary>
+            Converts a stream to a byte array
+            </summary>
+        </member>
+        <member name="T:WebOptimizer.Extensions.TagHelperExtensions">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.Extensions.TagHelperExtensions.HandleJsBundle(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput,WebOptimizer.IAssetPipeline,Microsoft.AspNetCore.Mvc.ActionContext,WebOptimizer.WebOptimizerOptions,System.String,System.String,System.String)">
+            <summary>
+            Process output of the tag helper
+            </summary>
+            <param name="output">A stateful HTML element used to generate an HTML tag.</param>
+            <param name="pipeline">The web optimization pipeline</param>
+            <param name="actionContext">Context object for execution of action</param>
+            <param name="options">Options for the Web Optimizer</param>
+            <param name="src">Source path value</param>
+            <param name="bundleKey">A key of associated bundle</param>
+            <param name="destBundleKey">The bundle key; Pass to generate the bundle tag.</param>
+            <returns>true - If processing is successful, otherwise - false</returns>
+        </member>
+        <member name="M:WebOptimizer.Extensions.TagHelperExtensions.HandleCssBundle(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput,WebOptimizer.IAssetPipeline,Microsoft.AspNetCore.Mvc.ActionContext,WebOptimizer.WebOptimizerOptions,System.String,System.String,System.String)">
+            <summary>
+            Process output of the tag helper
+            </summary>
+            <param name="output">A stateful HTML element used to generate an HTML tag.</param>
+            <param name="pipeline">The web optimization pipeline</param>
+            <param name="actionContext">Context object for execution of action</param>
+            <param name="options">Options for the Web Optimizer</param>
+            <param name="href">Source path value</param>
+            <param name="bundleKey">A key of associated bundle</param>
+            <param name="destBundleKey">The bundle key; Pass to generate the bundle tag.</param>
+            <returns>true - If processing is successful, otherwise - false</returns>
+        </member>
+        <member name="M:WebOptimizer.FileVersionProvider.#ctor(Microsoft.Extensions.FileProviders.IFileProvider,Microsoft.Extensions.Caching.Memory.IMemoryCache,Microsoft.AspNetCore.Http.PathString)">
+            <summary>
+            Creates a new instance of <see cref="T:WebOptimizer.FileVersionProvider"/>.
+            </summary>
+            <param name="fileProvider">The file provider to get and watch files.</param>
+            <param name="cache"><see cref="T:Microsoft.Extensions.Caching.Memory.IMemoryCache"/> where versioned urls of files are cached.</param>
+            <param name="requestPathBase">The base path for the current HTTP request.</param>
+        </member>
+        <member name="M:WebOptimizer.FileVersionProvider.AddFileVersionToPath(System.String)">
+            <summary>
+            Adds version query parameter to the specified file path.
+            </summary>
+            <param name="path">The path of the file to which version should be added.</param>
+            <returns>Path containing the version query string.</returns>
+            <remarks>
+            The version query string is appended with the key "v".
+            </remarks>
+        </member>
+        <member name="T:WebOptimizer.HttpResponseCacheControlAccessDirective">
+            <summary>
+            RFC-9111 HTTP Caching defines support for HTTP response cache-control directives 'private' and 'public'.
+            </summary>
+            <remarks>
+            See https://www.rfc-editor.org/rfc/rfc9111#name-private
+            See https://www.rfc-editor.org/rfc/rfc9111#name-public
+            </remarks>
+        </member>
+        <member name="F:WebOptimizer.HttpResponseCacheControlAccessDirective.Private">
+            <summary>
+            See https://www.rfc-editor.org/rfc/rfc9111#name-private
+            </summary>
+        </member>
+        <member name="F:WebOptimizer.HttpResponseCacheControlAccessDirective.Public">
+            <summary>
+            See https://www.rfc-editor.org/rfc/rfc9111#name-public
+            </summary>
+        </member>
+        <member name="T:WebOptimizer.IAsset">
+            <summary>
+            An interface for describing a bundle.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IAsset.ContentType">
+            <summary>
+            Gets the content type produced by the transform.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IAsset.Processors">
+            <summary>
+            Gets a list of processors
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IAsset.Items">
+            <summary>
+            Gets the items collection for the asset.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IAsset.Route">
+            <summary>
+            Gets the route to the bundle output.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IAsset.ExcludeFiles">
+            <summary>
+            Gets files to exclude from output results
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IAsset.SourceFiles">
+            <summary>
+            Gets the webroot relative source files.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.IAsset.ExecuteAsync(Microsoft.AspNetCore.Http.HttpContext,WebOptimizer.IWebOptimizerOptions)">
+            <summary>
+            Executes the processors and returns the modified content.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.IAsset.GenerateCacheKey(Microsoft.AspNetCore.Http.HttpContext,WebOptimizer.IWebOptimizerOptions)">
+            <summary>
+            Gets the cache key associated with this version of the asset.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.IAsset.TryAddSourceFile(System.String)">
+            <summary>
+            Adds a source file to the asset
+            </summary>
+            <param name="route">Relative path of a source file</param>
+        </member>
+        <member name="T:WebOptimizer.IAssetBuilder">
+            <summary>
+            A class for building a asset.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.IAssetBuilder.BuildAsync(WebOptimizer.IAsset,Microsoft.AspNetCore.Http.HttpContext,WebOptimizer.IWebOptimizerOptions)">
+            <summary>
+            Builds an asset by running it through all the processors.
+            </summary>
+        </member>
+        <member name="T:WebOptimizer.IAssetContext">
+            <summary>
+            The context used to perform processing to <see cref="T:WebOptimizer.IAsset"/> instances.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IAssetContext.Asset">
+            <summary>
+            Gets the transform.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IAssetContext.Content">
+            <summary>
+            Gets or sets the content of the response.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IAssetContext.HttpContext">
+            <summary>
+            Gets the HTTP context.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IAssetContext.Options">
+            <summary>
+            Gets the global options for WebOptimizer.
+            </summary>
+        </member>
+        <member name="T:WebOptimizer.IAssetPipeline">
+            <summary>
+            The web optimization pipeline
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IAssetPipeline.Assets">
+            <summary>
+            Gets the assets registered on the pipeline.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.IAssetPipeline.AddBundle(WebOptimizer.IAsset)">
+            <summary>
+            Adds an <see cref="T:WebOptimizer.IAsset"/> to the optimization pipeline.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.IAssetPipeline.AddBundle(System.Collections.Generic.IEnumerable{WebOptimizer.IAsset})">
+            <summary>
+            Adds an array of <see cref="T:WebOptimizer.IAsset"/> to the optimization pipeline.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.IAssetPipeline.AddBundle(System.String,System.String,System.String[])">
+            <summary>
+            Adds an asset to the optimization pipeline.
+            </summary>
+            <param name="route">The route matching for the asset.</param>
+            <param name="contentType">The content type of the response. Example: "text/css".</param>
+            <param name="sourceFiles">A list of relative file names of the sources to optimize.</param>
+        </member>
+        <member name="M:WebOptimizer.IAssetPipeline.AddAsset(System.String,System.String)">
+            <summary>
+            Add a generalized Asset, that has just a Route and a ContentType
+            
+            Typically used to fill in with content details later by Processors
+            
+            Used by AddJavaScriptBundle() to emit Source Maps on their own route
+            </summary>
+            <param name="route">The route that should cause the pipeline to respond with this Asset</param>
+            <param name="contentType">Content-Type of the response</param>
+        </member>
+        <member name="M:WebOptimizer.IAssetPipeline.AddFiles(System.String,System.String[])">
+            <summary>
+            Adds an array of files to the optimization pipeline.
+            </summary>
+            <param name="contentType">The content type of the response. Example: text/css or text/javascript.</param>
+            <param name="sourceFiles">A list of relative file names or globbing patterns of the sources to add.</param>
+        </member>
+        <member name="M:WebOptimizer.IAssetPipeline.TryGetAssetFromRoute(System.String,WebOptimizer.IAsset@)">
+            <summary>
+            Gets the <see cref="T:WebOptimizer.IAsset"/> from the specified route.
+            </summary>
+            <param name="route">The route to find the asset by.</param>
+            <param name="asset">The asset matching the route.</param>
+        </member>
+        <member name="T:WebOptimizer.IAssetResponse">
+            <summary>
+            The response from building an asset.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IAssetResponse.CacheKey">
+            <summary>
+            Gets the cache key.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IAssetResponse.Body">
+            <summary>
+            Gets the content of the response.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IAssetResponse.Headers">
+            <summary>
+            Gets the HTTP headers.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.IAssetResponseStore.AddAsync(System.String,System.String,WebOptimizer.AssetResponse)">
+            <summary>
+            Create or overwrite an entry in the cache.
+            </summary>
+            <param name="bucket"></param>
+            <param name="cachekey"></param>
+            <param name="assetResponse">An object identifying the entry.</param>
+            <returns><code>true</code> if the entry was created; otherwise <code>false</code>.</returns>
+        </member>
+        <member name="M:WebOptimizer.IAssetResponseStore.RemoveAsync(System.String,System.String)">
+            <summary>
+            Remove an entry from the cache.
+            </summary>
+            <param name="bucket"></param>
+            <param name="cachekey"></param>
+        </member>
+        <member name="M:WebOptimizer.IAssetResponseStore.TryGet(System.String,System.String,WebOptimizer.AssetResponse@)">
+            <summary>
+            Gets the <see cref="T:WebOptimizer.IAssetResponse"/> associated with <paramref name="cachekey"/> if present.
+            </summary>
+            <param name="bucket"></param>
+            <param name="cachekey">A string identifying the requested entry.</param>
+            <param name="assetResponse">The located value or null.</param>
+            <returns><code>true</code> if the key was found; otherwise <code>false</code>.</returns>
+        </member>
+        <member name="T:WebOptimizer.IWebOptimizerOptions">
+            <summary>
+            Options for the Web Optimizer.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IWebOptimizerOptions.EnableCaching">
+            <summary>
+            Gets or sets a value indicating whether server-side caching is enabled.
+            Default is <code>false</code> when running in a development environment.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IWebOptimizerOptions.EnableMemoryCache">
+            <summary>
+            Gets or sets a value indicating whether <see cref="T:Microsoft.Extensions.Caching.Memory.IMemoryCache"/> based caching is enabled.
+            Default is <code>false</code> when running in a development environment.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IWebOptimizerOptions.MemoryCacheTimeToLive">
+            <summary>
+            If <see cref="P:WebOptimizer.IWebOptimizerOptions.EnableMemoryCache"/> memory caching is enabled, control how long an entry is stored in memory.
+            Default is <code>TimeSpan.FromHours(24)</code>
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IWebOptimizerOptions.EnableDiskCache">
+            <summary>
+            Gets or sets a value indicating whether disk based caching is enabled.
+            Default is <code>false</code> when running in a development environment; 
+            otherwise the default is <code>true</code>.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IWebOptimizerOptions.CacheDirectory">
+            <summary>
+            Gets or sets the directory where assets will be stored if <see cref="P:WebOptimizer.IWebOptimizerOptions.EnableDiskCache"/> is <code>true</code>.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IWebOptimizerOptions.EnableTagHelperBundling">
+            <summary>
+            Gets or sets whether bundling is enabled.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IWebOptimizerOptions.CdnUrl">
+            <summary>
+            Gets the CDN url used for TagHelpers.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IWebOptimizerOptions.AllowEmptyBundle">
+            <summary>
+            Gets or sets whether empty bundle is allowed to generate instead of throwing an exception
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.IWebOptimizerOptions.HttpsCompression">
+            <summary>
+            Indicates if files should be compressed for HTTPS requests when the Response Compression middleware is available.
+            The default value is <see cref="F:Microsoft.AspNetCore.Http.Features.HttpsCompressionMode.Compress"/>.
+            </summary>
+            <remarks>
+            Enabling compression on HTTPS requests for remotely manipulable content may expose security problems.
+            </remarks>
+        </member>
+        <member name="M:WebOptimizer.Concatenator.MinifiedFileRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>(?i:.min.(css|js|html)$)</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match any character other than '\n'.<br/>
+            ○ Match a character in the set [Mm].<br/>
+            ○ Match a character in the set [Ii].<br/>
+            ○ Match a character in the set [Nn].<br/>
+            ○ Match any character other than '\n'.<br/>
+            ○ 1st capture group.<br/>
+                ○ Match with 3 alternative expressions.<br/>
+                    ○ Match a sequence of expressions.<br/>
+                        ○ Match a character in the set [Cc].<br/>
+                        ○ Match a character in the set [Ss] exactly 2 times.<br/>
+                    ○ Match a sequence of expressions.<br/>
+                        ○ Match a character in the set [Jj].<br/>
+                        ○ Match a character in the set [Ss].<br/>
+                    ○ Match a sequence of expressions.<br/>
+                        ○ Match a character in the set [Hh].<br/>
+                        ○ Match a character in the set [Tt].<br/>
+                        ○ Match a character in the set [Mm].<br/>
+                        ○ Match a character in the set [Ll].<br/>
+            ○ Match if at the end of the string or if before an ending newline.<br/>
+            </code>
+            </remarks>
+        </member>
+        <member name="M:WebOptimizer.CssFingerprinter.UrlRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>(url\\s*\\(\\s*)(["']?)([^:)]+)(\\2\\s*\\))</code><br/>
+            Options:<br/>
+            <code>RegexOptions.IgnoreCase | RegexOptions.Compiled</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ 1st capture group.<br/>
+                ○ Match a character in the set [Uu].<br/>
+                ○ Match a character in the set [Rr].<br/>
+                ○ Match a character in the set [Ll].<br/>
+                ○ Match a whitespace character atomically any number of times.<br/>
+                ○ Match '('.<br/>
+                ○ Match a whitespace character greedily any number of times.<br/>
+            ○ 2nd capture group.<br/>
+                ○ Match a character in the set ["'] greedily, optionally.<br/>
+            ○ 3rd capture group.<br/>
+                ○ Match a character in the set [^):] greedily at least once.<br/>
+            ○ 4th capture group.<br/>
+                ○ Match the same text as matched by the 2nd capture group.<br/>
+                ○ Match a whitespace character atomically any number of times.<br/>
+                ○ Match ')'.<br/>
+            </code>
+            </remarks>
+        </member>
+        <member name="M:WebOptimizer.CssImageInliner.UrlRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>(url\\s*\\(\\s*)(["']?)([^:)]+)(\\2\\s*\\))</code><br/>
+            Options:<br/>
+            <code>RegexOptions.IgnoreCase | RegexOptions.Compiled</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ 1st capture group.<br/>
+                ○ Match a character in the set [Uu].<br/>
+                ○ Match a character in the set [Rr].<br/>
+                ○ Match a character in the set [Ll].<br/>
+                ○ Match a whitespace character atomically any number of times.<br/>
+                ○ Match '('.<br/>
+                ○ Match a whitespace character greedily any number of times.<br/>
+            ○ 2nd capture group.<br/>
+                ○ Match a character in the set ["'] greedily, optionally.<br/>
+            ○ 3rd capture group.<br/>
+                ○ Match a character in the set [^):] greedily at least once.<br/>
+            ○ 4th capture group.<br/>
+                ○ Match the same text as matched by the 2nd capture group.<br/>
+                ○ Match a whitespace character atomically any number of times.<br/>
+                ○ Match ')'.<br/>
+            </code>
+            </remarks>
+        </member>
+        <member name="T:WebOptimizer.IProcessor">
+            <summary>
+            An interface for post processors.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.IProcessor.ExecuteAsync(WebOptimizer.IAssetContext)">
+            <summary>
+            Executes the processor on the specified configuration.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.IProcessor.CacheKey(Microsoft.AspNetCore.Http.HttpContext,WebOptimizer.IAssetContext)">
+            <summary>
+            Gets the custom key that should be used when calculating the memory cache key.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.Processors.JsSettings.GenerateSourceMap">
+            <summary>
+            Defaults to false.
+            Whether to generate source maps, allowing bundled code to be debugged using original source in places like Chrome Dev Tools.
+            Respects .SymbolsMap on base class, CodeSettings; this setting is ignored (treated as false) if caller sets .SymbolsMap
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.Processors.JsSettings.PipelineSourceMap">
+            <summary>
+            Set by the framework if GenerateSourceMap is true
+            Helps a given Bundle Asset identify its SourceMap Asset to write to.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.Processors.JsSettings.CodeSettings">
+            <summary>
+            NUglify is the underlying minifier for WebOptimizer.
+            It's derived from Microsoft's AjaxMin.
+            </summary>
+        </member>
+        <member name="T:WebOptimizer.Processor">
+            <summary>
+            A base class for processors
+            </summary>
+            <seealso cref="T:WebOptimizer.IProcessor" />
+        </member>
+        <member name="M:WebOptimizer.Processor.CacheKey(Microsoft.AspNetCore.Http.HttpContext,WebOptimizer.IAssetContext)">
+            <summary>
+            Gets the custom key that should be used when calculating the memory cache key.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.Processor.ExecuteAsync(WebOptimizer.IAssetContext)">
+            <summary>
+            Executes the processor on the specified configuration.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.RelativePathAdjuster.RxUrl">
+            <remarks>
+            Pattern:<br/>
+            <code>(url\\s*\\(\\s*)(["']?)([^:)]+)(\\2\\s*\\))</code><br/>
+            Options:<br/>
+            <code>RegexOptions.IgnoreCase | RegexOptions.Compiled</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ 1st capture group.<br/>
+                ○ Match a character in the set [Uu].<br/>
+                ○ Match a character in the set [Rr].<br/>
+                ○ Match a character in the set [Ll].<br/>
+                ○ Match a whitespace character atomically any number of times.<br/>
+                ○ Match '('.<br/>
+                ○ Match a whitespace character greedily any number of times.<br/>
+            ○ 2nd capture group.<br/>
+                ○ Match a character in the set ["'] greedily, optionally.<br/>
+            ○ 3rd capture group.<br/>
+                ○ Match a character in the set [^):] greedily at least once.<br/>
+            ○ 4th capture group.<br/>
+                ○ Match the same text as matched by the 2nd capture group.<br/>
+                ○ Match a whitespace character atomically any number of times.<br/>
+                ○ Match ')'.<br/>
+            </code>
+            </remarks>
+        </member>
+        <member name="M:WebOptimizer.TagHelpersDynamic.Helpers.GenerateHash(WebOptimizer.IAsset,Microsoft.AspNetCore.Http.HttpContext,WebOptimizer.IWebOptimizerOptions)">
+            <summary>
+            Generates a hash of the files in the bundle.
+            /// </summary>
+        </member>
+        <member name="T:WebOptimizer.TagHelpersDynamic.LinkTagHelper">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.Razor.TagHelpers.ITagHelper"/> implementation targeting &lt;link&gt; elements that supports fallback href paths.
+            </summary>
+            <remarks>
+            The tag helper won't process for cases with just the 'href' attribute.
+            </remarks>
+        </member>
+        <member name="P:WebOptimizer.TagHelpersDynamic.LinkTagHelper.BundleKey">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:WebOptimizer.TagHelpersDynamic.LinkTagHelper.BundleDestinationKey">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="M:WebOptimizer.TagHelpersDynamic.LinkTagHelper.#ctor(WebOptimizer.IAssetPipeline,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.AspNetCore.Mvc.Razor.Infrastructure.TagHelperMemoryCacheProvider,Microsoft.AspNetCore.Mvc.ViewFeatures.IFileVersionProvider,System.Text.Encodings.Web.HtmlEncoder,System.Text.Encodings.Web.JavaScriptEncoder,Microsoft.AspNetCore.Mvc.Routing.IUrlHelperFactory,Microsoft.Extensions.Options.IOptionsSnapshot{WebOptimizer.WebOptimizerOptions})">
+            <summary>
+            Creates a new <see cref="T:WebOptimizer.TagHelpersDynamic.LinkTagHelper"/>.
+            </summary>
+            <param name="pipeline"></param>
+            <param name="hostingEnvironment">The <see cref="T:Microsoft.AspNetCore.Hosting.IWebHostEnvironment"/>.</param>
+            <param name="cache">The <see cref="T:Microsoft.Extensions.Caching.Memory.IMemoryCache"/>.</param>
+            <param name="fileVersionProvider"></param>
+            <param name="htmlEncoder">The <see cref="T:System.Text.Encodings.Web.HtmlEncoder"/>.</param>
+            <param name="javaScriptEncoder">The <see cref="T:System.Text.Encodings.Web.JavaScriptEncoder"/>.</param>
+            <param name="urlHelperFactory">The <see cref="T:Microsoft.AspNetCore.Mvc.Routing.IUrlHelperFactory"/>.</param>
+            <param name="webOptimizerOptions"></param>
+        </member>
+        <member name="M:WebOptimizer.TagHelpersDynamic.LinkTagHelper.Process(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext,Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput)">
+            <inheritdoc />
+        </member>
+        <member name="M:WebOptimizer.TagHelpersDynamic.MinifyOnDemandTagHelper.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Caching.Memory.IMemoryCache,WebOptimizer.IAssetPipeline,Microsoft.Extensions.Options.IOptionsMonitor{WebOptimizer.WebOptimizerOptions})">
+            <summary>
+            Initializes a new instance of the <see cref="T:WebOptimizer.Taghelpers.BaseTagHelper"/> class.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.TagHelpersDynamic.MinifyOnDemandTagHelper.ProcessAsync(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext,Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput)">
+            <summary>
+            Asynchronously executes the <see cref="T:Microsoft.AspNetCore.Razor.TagHelpers.TagHelper" /> with the given <paramref name="context" /> and
+            <paramref name="output" />.
+            </summary>
+            <param name="context">Contains information associated with the current HTML tag.</param>
+            <param name="output">A stateful HTML element used to generate an HTML tag.</param>
+        </member>
+        <member name="T:WebOptimizer.TagHelpersDynamic.ScriptTagHelper">
+            <summary>
+            <see cref="T:Microsoft.AspNetCore.Razor.TagHelpers.ITagHelper"/> implementation targeting &lt;script&gt; elements that supports fallback src paths.
+            </summary>
+            <remarks>
+            The tag helper won't process for cases with just the 'src' attribute.
+            </remarks>
+        </member>
+        <member name="P:WebOptimizer.TagHelpersDynamic.ScriptTagHelper.BundleKey">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:WebOptimizer.TagHelpersDynamic.ScriptTagHelper.BundleDestinationKey">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="M:WebOptimizer.TagHelpersDynamic.ScriptTagHelper.#ctor(WebOptimizer.IAssetPipeline,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.AspNetCore.Mvc.Razor.Infrastructure.TagHelperMemoryCacheProvider,Microsoft.AspNetCore.Mvc.ViewFeatures.IFileVersionProvider,System.Text.Encodings.Web.HtmlEncoder,System.Text.Encodings.Web.JavaScriptEncoder,Microsoft.AspNetCore.Mvc.Routing.IUrlHelperFactory,Microsoft.Extensions.Options.IOptionsSnapshot{WebOptimizer.WebOptimizerOptions})">
+            <summary>
+            Creates a new <see cref="T:WebOptimizer.TagHelpersDynamic.ScriptTagHelper"/>.
+            </summary>
+            <param name="pipeline"></param>
+            <param name="hostingEnvironment">The <see cref="T:Microsoft.AspNetCore.Hosting.IWebHostEnvironment"/>.</param>
+            <param name="cache">The <see cref="T:Microsoft.Extensions.Caching.Memory.IMemoryCache"/>.</param>
+            <param name="fileVersionProvider"></param>
+            <param name="htmlEncoder">The <see cref="T:System.Text.Encodings.Web.HtmlEncoder"/>.</param>
+            <param name="javaScriptEncoder">The <see cref="T:System.Text.Encodings.Web.JavaScriptEncoder"/>.</param>
+            <param name="urlHelperFactory">The <see cref="T:Microsoft.AspNetCore.Mvc.Routing.IUrlHelperFactory"/>.</param>
+            <param name="webOptimizerOptions"></param>
+        </member>
+        <member name="M:WebOptimizer.TagHelpersDynamic.ScriptTagHelper.Process(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext,Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput)">
+            <inheritdoc />
+        </member>
+        <member name="T:WebOptimizer.Taghelpers.BaseTagHelper">
+            <summary>
+            A base class for TagHelpers
+            </summary>
+            <seealso cref="T:Microsoft.AspNetCore.Razor.TagHelpers.TagHelper" />
+        </member>
+        <member name="M:WebOptimizer.Taghelpers.BaseTagHelper.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Caching.Memory.IMemoryCache,WebOptimizer.IAssetPipeline,Microsoft.Extensions.Options.IOptionsMonitor{WebOptimizer.WebOptimizerOptions})">
+            <summary>
+            Initializes a new instance of the <see cref="T:WebOptimizer.Taghelpers.BaseTagHelper"/> class.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.Taghelpers.BaseTagHelper.HostingEnvironment">
+            <summary>
+            Gets the hosting environment.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.Taghelpers.BaseTagHelper.Cache">
+            <summary>
+            The cache object.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.Taghelpers.BaseTagHelper.Pipeline">
+            <summary>
+            Gets the pipeline.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.Taghelpers.BaseTagHelper.Options">
+            <summary>
+            Gets the options.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.Taghelpers.BaseTagHelper.Order">
+            <summary>
+            Makes sure this taghelper runs before the built in ones.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.Taghelpers.BaseTagHelper.ViewContext">
+            <summary>
+            Gets or sets the view context.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.Taghelpers.BaseTagHelper.GetQuote(Microsoft.AspNetCore.Razor.TagHelpers.HtmlAttributeValueStyle)">
+            <summary>
+            Gets the quote character.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.Taghelpers.BaseTagHelper.AddFileVersionToPath(System.String,WebOptimizer.IAsset)">
+            <summary>
+            Generates a has of the file.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.Taghelpers.BaseTagHelper.AddPathBase(System.String)">
+            <summary>
+            Adds current the PathBase to a Url
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.Taghelpers.BaseTagHelper.GenerateHash(WebOptimizer.IAsset)">
+            <summary>
+            Generates a has of the files in the bundle.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.Taghelpers.BaseTagHelper.AddToCache(System.String,System.String,Microsoft.Extensions.FileProviders.IFileProvider,System.String[])">
+            <summary>
+            Adds string value to memory cache.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.Taghelpers.BaseTagHelper.AddCdn(System.String)">
+            <summary>
+            Adds the CdnUrl defined in Options to a Url
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:WebOptimizer.Taghelpers.LinkInlineHrefTagHelper">
+            <summary>
+            Tag helper for inlining CSS
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.Taghelpers.LinkInlineHrefTagHelper.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Caching.Memory.IMemoryCache,WebOptimizer.IAssetPipeline,Microsoft.Extensions.Options.IOptionsMonitor{WebOptimizer.WebOptimizerOptions},WebOptimizer.IAssetBuilder)">
+            <summary>
+            Tag helper for inlining content
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.Taghelpers.LinkInlineHrefTagHelper.Order">
+            <summary>
+            Makes sure this taghelper runs before the built in ones.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.Taghelpers.LinkInlineHrefTagHelper.Href">
+            <summary>
+            Gets or sets the href attribute
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.Taghelpers.LinkInlineHrefTagHelper.ProcessAsync(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext,Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput)">
+            <summary>
+            Creates a tag helper for inlining content
+            </summary>
+        </member>
+        <member name="T:WebOptimizer.Taghelpers.LinkTagHelper">
+            <summary>
+            A TagHelper for hooking CSS bundles up to the HTML page.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.Taghelpers.LinkTagHelper.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Caching.Memory.IMemoryCache,WebOptimizer.IAssetPipeline,Microsoft.Extensions.Options.IOptionsMonitor{WebOptimizer.WebOptimizerOptions})">
+            <summary>
+            Initializes a new instance of the <see cref="T:WebOptimizer.Taghelpers.LinkTagHelper"/> class.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.Taghelpers.LinkTagHelper.CurrentViewContext">
+            <summary>
+            For HttpContext Access
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.Taghelpers.LinkTagHelper.Process(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext,Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput)">
+            <summary>
+            Synchronously executes the TagHelper
+            </summary>
+        </member>
+        <member name="T:WebOptimizer.Taghelpers.ScriptInlineSrcTagHelper">
+            <summary>
+            Tag helper for inlining CSS
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.Taghelpers.ScriptInlineSrcTagHelper.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Caching.Memory.IMemoryCache,WebOptimizer.IAssetPipeline,Microsoft.Extensions.Options.IOptionsMonitor{WebOptimizer.WebOptimizerOptions},WebOptimizer.IAssetBuilder)">
+            <summary>
+            Tag helper for inlining content
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.Taghelpers.ScriptInlineSrcTagHelper.Order">
+            <summary>
+            Makes sure this taghelper runs before the built in ones.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.Taghelpers.ScriptInlineSrcTagHelper.Src">
+            <summary>
+            Gets or sets the src attribute
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.Taghelpers.ScriptInlineSrcTagHelper.ProcessAsync(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext,Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput)">
+            <summary>
+            Creates a tag helper for inlining content
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.Taghelpers.ScriptInlineSrcTagHelper.GetFileContentAsync(System.String)">
+            <summary>
+            Gets the file content asynchronous.
+            </summary>
+            <exception cref="T:System.IO.FileNotFoundException">File or bundle doesn't exist</exception>
+        </member>
+        <member name="T:WebOptimizer.Taghelpers.ScriptTagHelper">
+            <summary>
+            A TagHelper for hooking JavaScript bundles up to the HTML page.
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.Taghelpers.ScriptTagHelper.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Caching.Memory.IMemoryCache,WebOptimizer.IAssetPipeline,Microsoft.Extensions.Options.IOptionsMonitor{WebOptimizer.WebOptimizerOptions})">
+            <summary>
+            Initializes a new instance of the <see cref="T:WebOptimizer.Taghelpers.ScriptTagHelper"/> class.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.Taghelpers.ScriptTagHelper.CurrentViewContext">
+            <summary>
+            For HttpContext Access
+            </summary>
+        </member>
+        <member name="M:WebOptimizer.Taghelpers.ScriptTagHelper.Process(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext,Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput)">
+            <summary>
+            Synchronously executes the TagHelper
+            </summary>
+        </member>
+        <member name="T:WebOptimizer.WebOptimizerOptions">
+            <summary>
+            Options for the Web Optimizer.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.WebOptimizerOptions.CacheControlAccess">
+            <summary>
+            Gets or sets a value indicating whether the cache is private, public or unspecified.
+            </summary>
+            <remarks>
+            For performance, recommendation is to set to <see cref="F:WebOptimizer.HttpResponseCacheControlAccessDirective.Public" />.
+            </remarks>
+        </member>
+        <member name="P:WebOptimizer.WebOptimizerOptions.EnableCaching">
+            <summary>
+            Gets or sets a value indicating whether server-side caching is enabled.
+            Default is <code>false</code> when running in a development environment.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.WebOptimizerOptions.EnableMemoryCache">
+            <summary>
+            Gets or sets a value indicating whether <see cref="T:Microsoft.Extensions.Caching.Memory.IMemoryCache"/> based caching is enabled.
+            Default is <code>true</code>.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.WebOptimizerOptions.MemoryCacheTimeToLive">
+            <summary>
+            If <see cref="P:WebOptimizer.WebOptimizerOptions.EnableMemoryCache"/> memory caching is enabled, control how long an entry is stored in memory.
+            Default is <code>TimeSpan.FromHours(24)</code>
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.WebOptimizerOptions.EnableDiskCache">
+            <summary>
+            Gets or sets a value indicating whether disk based caching is enabled.
+            Default is <code>false</code> when running in a development environment; 
+            otherwise the default is <code>true</code>.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.WebOptimizerOptions.EnableTagHelperBundling">
+            <summary>
+            Gets or sets whether bundling is enabled.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.WebOptimizerOptions.CdnUrl">
+            <summary>
+            Gets the CDN url used for TagHelpers.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.WebOptimizerOptions.CacheDirectory">
+            <summary>
+            Gets or sets the directory where assets will be stored if <see cref="P:WebOptimizer.WebOptimizerOptions.EnableDiskCache"/> is <code>true</code>.
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.WebOptimizerOptions.AllowEmptyBundle">
+            <summary>
+            Gets or sets whether empty bundle is allowed to generate instead of throwing an exception
+            </summary>
+        </member>
+        <member name="P:WebOptimizer.WebOptimizerOptions.HttpsCompression">
+            <summary>
+            Indicates if files should be compressed for HTTPS requests when the Response Compression middleware is available.
+            The default value is <see cref="F:Microsoft.AspNetCore.Http.Features.HttpsCompressionMode.Compress"/>.
+            </summary>
+            <remarks>
+            Enabling compression on HTTPS requests for remotely manipulable content may expose security problems.
+            </remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Builder.ApplicationBuilderExtensions">
+            <summary>
+            Extension methods for <see cref="T:WebOptimizer.IAssetPipeline"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Builder.ApplicationBuilderExtensions.UseWebOptimizer(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,WebOptimizer.FileProviderOptions[])">
+            <summary>
+            Adds WebOptimizer to the <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> request execution pipeline
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Builder.ApplicationBuilderExtensions.UseWebOptimizer(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Adds WebOptimizer to the <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> request execution pipeline
+            </summary>
+        </member>
+        <member name="T:Microsoft.Extensions.DependencyInjection.ServiceExtensions">
+            <summary>
+            Extension methods for <see cref="T:WebOptimizer.IAssetPipeline"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.ServiceExtensions.AddWebOptimizer(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.DependencyInjection.CssBundlingSettings,Microsoft.Extensions.DependencyInjection.CodeBundlingSettings,System.Action{WebOptimizer.IAssetPipeline})">
+            <summary>
+            Adds WebOptimizer to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> and enables CSS and JavaScript minification.
+            </summary>
+            <param name="services">The service collection.</param>
+            <param name="env"></param>
+            <param name="cssBundlingSettings"></param>
+            <param name="codeBundlingSettings"></param>
+            <param name="assetPipeline">The web optimization pipeline</param>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.ServiceExtensions.AddWebOptimizer(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.DependencyInjection.CssBundlingSettings,Microsoft.Extensions.DependencyInjection.CodeBundlingSettings,System.Action{WebOptimizer.WebOptimizerOptions},System.Action{WebOptimizer.IAssetPipeline})">
+            <summary>
+            Adds WebOptimizer to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> and enables CSS and JavaScript minification.
+            </summary>
+            <param name="services">The service collection.</param>
+            <param name="env"></param>
+            <param name="cssBundlingSettings"></param>
+            <param name="codeBundlingSettings"></param>
+            <param name="configureWebOptimizer">WebOptimizer settings</param>
+            <param name="assetPipeline">The web optimization pipeline</param>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.ServiceExtensions.AddWebOptimizer(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Boolean,System.Boolean)">
+            <summary>
+            Adds WebOptimizer to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> and enables CSS and JavaScript minification.
+            </summary>
+            <param name="services">The service collection.</param>
+            <param name="minifyJavaScript">If <code>true</code>; calls <code>AddJs()</code> on the pipeline.</param>
+            <param name="minifyCss">If <code>true</code>; calls <code>AddCss()</code> on the pipeline.</param>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.ServiceExtensions.AddWebOptimizer(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{WebOptimizer.WebOptimizerOptions},System.Boolean,System.Boolean)">
+            <summary>
+            Adds WebOptimizer to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> and enables CSS and JavaScript minification.
+            </summary>
+            <param name="services">The service collection.</param>
+            <param name="minifyJavaScript">If <code>true</code>; calls <code>AddJs()</code> on the pipeline.</param>
+            <param name="minifyCss">If <code>true</code>; calls <code>AddCss()</code> on the pipeline.</param>
+            <param name="configureWebOptimizer">WebOptimizer settings</param>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.ServiceExtensions.AddWebOptimizer(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{WebOptimizer.IAssetPipeline},System.Action{WebOptimizer.WebOptimizerOptions})">
+            <summary>
+            Adds WebOptimizer to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
+            </summary>
+            <param name="services">The service collection.</param>
+            <param name="assetPipeline">The web optimization pipeline</param>
+            <param name="configureWebOptimizer">WebOptimizer settings</param>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.ServiceExtensions.AddWebOptimizer(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{WebOptimizer.IAssetPipeline})">
+            <summary>
+            Adds WebOptimizer to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions">
+            <summary>
+            Extension methods for <see cref="T:WebOptimizer.IAssetPipeline"/>.
+            </summary>
+            <summary>
+            Extension methods for <see cref="T:WebOptimizer.IAssetPipeline"/>.
+            </summary>
+            <summary>
+            Extension methods for <see cref="T:WebOptimizer.IAssetPipeline"/>.
+            </summary>
+            <summary>
+            Extension methods for <see cref="T:WebOptimizer.IAssetPipeline"/>.
+            </summary>
+            <summary>
+            Extension methods for <see cref="T:WebOptimizer.IAssetPipeline"/>.
+            </summary>
+            <summary>
+            Extension methods for <see cref="T:WebOptimizer.IAssetPipeline"/>.
+            </summary>
+            <summary>
+            Extension methods for <see cref="T:WebOptimizer.IAssetPipeline"/>.
+            </summary>
+            <summary>
+            Extension methods for <see cref="T:WebOptimizer.IAssetPipeline"/>.
+            </summary>
+            <summary>
+            Extension methods for <see cref="T:WebOptimizer.IAssetPipeline"/>.
+            </summary>
+            <summary>
+            Extension methods for <see cref="T:WebOptimizer.IAssetPipeline"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.Concatenate(WebOptimizer.IAsset)">
+            <summary>
+            Adds the string content of all source files to the pipeline.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.Concatenate(System.Collections.Generic.IEnumerable{WebOptimizer.IAsset})">
+            <summary>
+            Adds the string content of all source files to the pipeline.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.FingerprintUrls(WebOptimizer.IAsset)">
+            <summary>
+            Adds a fingerprint to local url() references.
+            NOTE: Make sure to call this method before Concatinate()
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.FingerprintUrls(System.Collections.Generic.IEnumerable{WebOptimizer.IAsset})">
+            <summary>
+            Adds a fingerprint to local url() references.
+            NOTE: Make sure to call this method before Concatinate()
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.InlineImages(WebOptimizer.IAsset,System.Int32)">
+            <summary>
+            Inlines url() references as base64 encoded strings if the image size is below <paramref name="maxFileSize"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.InlineImages(System.Collections.Generic.IEnumerable{WebOptimizer.IAsset},System.Int32)">
+            <summary>
+            Adds a fingerprint to local url() references.
+            NOTE: Make sure to call Concatinate() before this method
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyCssFiles(WebOptimizer.IAssetPipeline)">
+            <summary>
+            Minifies any .css file requested.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyCssFiles(WebOptimizer.IAssetPipeline,NUglify.Css.CssSettings)">
+            <summary>
+            Minifies any .css file requested.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyCssFiles(WebOptimizer.IAssetPipeline,System.String[])">
+            <summary>
+            Minifies the specified .css files.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyCssFiles(WebOptimizer.IAssetPipeline,NUglify.Css.CssSettings,System.String[])">
+            <summary>
+            Minifies the specified .css files.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.AddCssBundle(WebOptimizer.IAssetPipeline,System.String,System.String[])">
+            <summary>
+            Creates a CSS bundle on the specified route and minifies the output.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.AddCssBundle(WebOptimizer.IAssetPipeline,System.String,NUglify.Css.CssSettings,System.String[])">
+            <summary>
+            Creates a CSS bundle on the specified route and minifies the output.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyCss(WebOptimizer.IAsset)">
+            <summary>
+            Runs the CSS minifier on the content.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyCss(WebOptimizer.IAsset,NUglify.Css.CssSettings)">
+            <summary>
+            Runs the CSS minifier on the content.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyCss(System.Collections.Generic.IEnumerable{WebOptimizer.IAsset})">
+            <summary>
+            Runs the CSS minifier on the content.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyCss(System.Collections.Generic.IEnumerable{WebOptimizer.IAsset},NUglify.Css.CssSettings)">
+            <summary>
+            Runs the CSS minifier on the content.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.EnforceFileExtensions(WebOptimizer.IAsset,System.String[])">
+            <summary>
+            Throws an exception if any file doesn't match one of the specified file extensions.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.EnforceFileExtensions(System.Collections.Generic.IEnumerable{WebOptimizer.IAsset},System.String[])">
+            <summary>
+            Throws an exception if any file doesn't match one of the specified file extensions.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyHtmlFiles(WebOptimizer.IAssetPipeline)">
+            <summary>
+            Minifies any .html file requested.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyHtmlFiles(WebOptimizer.IAssetPipeline,NUglify.Html.HtmlSettings)">
+            <summary>
+            Minifies any .html file requested.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyHtmlFiles(WebOptimizer.IAssetPipeline,System.String[])">
+            <summary>
+            Minifies the specified .html files.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyHtmlFiles(WebOptimizer.IAssetPipeline,NUglify.Html.HtmlSettings,System.String[])">
+            <summary>
+            Minifies the specified .html files.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.AddHtmlBundle(WebOptimizer.IAssetPipeline,System.String,System.String[])">
+            <summary>
+            Creates a HTML bundle on the specified route and minifies the output.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.AddHtmlBundle(WebOptimizer.IAssetPipeline,System.String,NUglify.Html.HtmlSettings,System.String[])">
+            <summary>
+            Creates a HTML bundle on the specified route and minifies the output.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyHtml(WebOptimizer.IAsset)">
+            <summary>
+            Runs the HTML minifier on the content.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyHtml(WebOptimizer.IAsset,NUglify.Html.HtmlSettings)">
+            <summary>
+            Runs the HTML minifier on the content.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyHtml(System.Collections.Generic.IEnumerable{WebOptimizer.IAsset})">
+            <summary>
+            Runs the HTML minifier on the content.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyHtml(System.Collections.Generic.IEnumerable{WebOptimizer.IAsset},NUglify.Html.HtmlSettings)">
+            <summary>
+            Runs the HTML minifier on the content.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.UseItemContent(WebOptimizer.IAsset)">
+            <summary>
+            Changes the Asset to only emit to Response what is stored in
+            asset.Items["Content"]
+            and nothing else
+            
+            Useful for Generated Content
+            
+            Used by JavaScriptMinifier.AddJavaScriptBundle to emit sourcemaps into a separate Asset
+            when generating minified code
+            </summary>
+            <param name="asset"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.UseItemContent(System.Collections.Generic.IEnumerable{WebOptimizer.IAsset})">
+            <summary>
+            Changes the Asset to only emit to Response what is stored in
+            asset.Items["Content"]
+            and nothing else
+            
+            Useful for Generated Content
+            
+            Used by JavaScriptMinifier.AddJavaScriptBundle to emit sourcemaps into a separate Asset
+            when generating minified code
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyJsFiles(WebOptimizer.IAssetPipeline)">
+            <summary>
+            Minifies any .js file requested.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyJsFiles(WebOptimizer.IAssetPipeline,NUglify.JavaScript.CodeSettings)">
+            <summary>
+            Minifies any .js file requested.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyJsFiles(WebOptimizer.IAssetPipeline,System.String[])">
+            <summary>
+            Minifies the specified .js files.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyJsFiles(WebOptimizer.IAssetPipeline,WebOptimizer.Processors.JsSettings,System.String[])">
+            <summary>
+            Minifies the specified .js files.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.AddJavaScriptBundle(WebOptimizer.IAssetPipeline,System.String,System.String[])">
+            <summary>
+            Creates a JavaScript bundle on the specified route and minifies the output.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.AddJavaScriptBundle(WebOptimizer.IAssetPipeline,System.String,WebOptimizer.Processors.JsSettings,System.String[])">
+            <summary>
+            Creates a JavaScript bundle on the specified route and minifies the output.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyJavaScript(WebOptimizer.IAsset)">
+            <summary>
+            Runs the JavaScript minifier on the content.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyJavaScript(WebOptimizer.IAsset,WebOptimizer.Processors.JsSettings)">
+            <summary>
+            Runs the JavaScript minifier on the content.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyJavaScript(System.Collections.Generic.IEnumerable{WebOptimizer.IAsset})">
+            <summary>
+            Runs the JavaScript minifier on the content.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.MinifyJavaScript(System.Collections.Generic.IEnumerable{WebOptimizer.IAsset},WebOptimizer.Processors.JsSettings)">
+            <summary>
+            Runs the JavaScript minifier on the content.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.AdjustRelativePaths(WebOptimizer.IAsset)">
+            <summary>
+            Adjusts the relative paths in CSS documents.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.AdjustRelativePaths(System.Collections.Generic.IEnumerable{WebOptimizer.IAsset})">
+            <summary>
+            Adjusts the relative paths in CSS documents.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.AddResponseHeader(WebOptimizer.IAsset,System.String,System.String)">
+            <summary>
+            Adds a fingerprint to local url() references.
+            NOTE: Make sure to call Concatenate() before this method
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.AddResponseHeader(System.Collections.Generic.IEnumerable{WebOptimizer.IAsset},System.String,System.String)">
+            <summary>
+            Adds a fingerprint to local url() references.
+            NOTE: Make sure to call Concatenate() before this method
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.UseContentRoot(WebOptimizer.IAsset)">
+            <summary>
+            Uses the content root folder (usually the project root) instead of the wwwroot.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AssetPipelineExtensions.UseFileProvider(WebOptimizer.IAsset,Microsoft.Extensions.FileProviders.IFileProvider)">
+            <summary>
+            Uses the specified <see cref="T:Microsoft.Extensions.FileProviders.IFileProvider"/> to locate the source files.
+            </summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.MinifiedFileRegex_0">
+            <summary>Custom <see cref="T:System.Text.RegularExpressions.Regex"/>-derived type for the MinifiedFileRegex method.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.MinifiedFileRegex_0.Instance">
+            <summary>Cached, thread-safe singleton instance.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MinifiedFileRegex_0.#ctor">
+            <summary>Initializes the instance.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.MinifiedFileRegex_0.RunnerFactory">
+            <summary>Provides a factory for creating <see cref="T:System.Text.RegularExpressions.RegexRunner"/> instances to be used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MinifiedFileRegex_0.RunnerFactory.CreateInstance">
+            <summary>Creates an instance of a <see cref="T:System.Text.RegularExpressions.RegexRunner"/> used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.MinifiedFileRegex_0.RunnerFactory.Runner">
+            <summary>Provides the runner that contains the custom logic implementing the specified regular expression.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MinifiedFileRegex_0.RunnerFactory.Runner.Scan(System.ReadOnlySpan{System.Char})">
+            <summary>Scan the <paramref name="inputSpan"/> starting from base.runtextstart for the next match.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MinifiedFileRegex_0.RunnerFactory.Runner.TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Search <paramref name="inputSpan"/> starting from base.runtextpos for the next location a match could possibly start.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if a possible match was found; false if no more matches are possible.</returns>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MinifiedFileRegex_0.RunnerFactory.Runner.TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Determine whether <paramref name="inputSpan"/> at base.runtextpos is a match for the regular expression.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if the regular expression matches at the current position; otherwise, false.</returns>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.UrlRegex_1">
+            <summary>Caches a <see cref="T:System.Text.RegularExpressions.Regex"/> instance for the UrlRegex method.</summary>
+            <remarks>A custom Regex-derived type could not be generated because the expression contains case-insensitive backreferences which are not supported by the source generator.</remarks>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.UrlRegex_1.Instance">
+            <summary>Cached, thread-safe singleton instance.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.Utilities">
+            <summary>Helper methods used by generated <see cref="T:System.Text.RegularExpressions.Regex"/>-derived implementations.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_defaultTimeout">
+            <summary>Default timeout value set in <see cref="T:System.AppContext"/>, or <see cref="F:System.Text.RegularExpressions.Regex.InfiniteMatchTimeout"/> if none was set.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_hasTimeout">
+            <summary>Whether <see cref="F:System.Text.RegularExpressions.Generated.Utilities.s_defaultTimeout"/> is non-infinite.</summary>
+        </member>
+    </members>
+</doc>

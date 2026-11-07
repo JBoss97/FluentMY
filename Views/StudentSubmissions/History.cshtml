@@ -1,0 +1,389 @@
+﻿@model FluentMY.ViewModels.StudentLearningHistoryPageViewModel
+@using System
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "My Learning History";
+}
+
+<style>
+    .history-shell {
+        color: #1f2937;
+    }
+
+    .history-hero {
+        border-radius: 24px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 30px;
+        margin-bottom: 24px;
+        box-shadow: 0 18px 36px rgba(13, 110, 253, 0.20);
+    }
+
+        .history-hero h2 {
+            margin: 0 0 8px;
+            font-weight: 800;
+        }
+
+        .history-hero p {
+            margin: 0;
+            color: rgba(255,255,255,0.88);
+        }
+
+    .history-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 22px;
+    }
+
+    .history-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+
+        .history-toolbar .btn {
+            border-radius: 12px;
+            font-weight: 600;
+            padding: 10px 16px;
+        }
+
+    .history-filter-form {
+        display: flex;
+        align-items: end;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .history-filter-group label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .history-filter-group select {
+        min-width: 180px;
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        padding: 8px 12px;
+        background: #fff;
+        cursor: pointer;
+    }
+
+    .history-table {
+        margin-bottom: 0;
+    }
+
+        .history-table > thead > tr > th {
+            border-top: none !important;
+            color: #374151;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+
+        .history-table > tbody > tr > td {
+            vertical-align: middle;
+        }
+
+    .history-course {
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .history-lesson {
+        color: #4b5563;
+    }
+
+    .history-prompt {
+        color: #6b7280;
+        font-size: 13px;
+        margin-top: 6px;
+        line-height: 1.5;
+    }
+
+    .history-pill {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #0d6efd;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .history-pill-speaking {
+        background: #ecfeff;
+        color: #0f766e;
+    }
+
+    .history-pill-gameplay {
+        background: #f5f3ff;
+        color: #7c3aed;
+    }
+
+    .muted-small {
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .summary-text {
+        color: #374151;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 24px;
+        border: 1px dashed rgba(15, 23, 42, 0.12);
+        border-radius: 18px;
+        background: #fff;
+    }
+
+        .empty-state h4 {
+            font-weight: 800;
+            margin-top: 0;
+            margin-bottom: 8px;
+            color: #111827;
+        }
+
+        .empty-state p {
+            color: #6b7280;
+            margin-bottom: 16px;
+        }
+
+    .history-action-btn {
+        border-radius: 10px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .history-pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-top: 18px;
+        flex-wrap: wrap;
+    }
+
+    .history-page-links {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+        .history-page-links .btn {
+            border-radius: 10px;
+            min-width: 42px;
+        }
+
+    @@media (max-width: 767px) {
+        .history-table {
+            font-size: 14px;
+        }
+    }
+</style>
+
+<div class="history-shell">
+    <div class="history-hero">
+        <h2>My Learning History</h2>
+        <p>View your previous lessons performance and monitor your improvement over time.</p>
+    </div>
+
+    @if (Model == null || Model.Items == null || !Model.Items.Any())
+    {
+        <div class="history-card" style="margin-bottom:20px;">
+            <div class="history-toolbar">
+                @using (Html.BeginForm("History", "StudentSubmissions", FormMethod.Get, new { @class = "history-filter-form" }))
+                {
+                    <div class="history-filter-group">
+                        <label for="type">Filter by type</label>
+                        <select id="type" name="type" onchange="this.form.submit()">
+                            <option value="All" @(Model != null && string.Equals(Model.SelectedType, "All", StringComparison.OrdinalIgnoreCase) ? "selected" : "")>All</option>
+                            <option value="Quiz" @(Model != null && string.Equals(Model.SelectedType, "Quiz", StringComparison.OrdinalIgnoreCase) ? "selected" : "")>Quiz</option>
+                            <option value="Speaking" @(Model != null && string.Equals(Model.SelectedType, "Speaking", StringComparison.OrdinalIgnoreCase) ? "selected" : "")>Speaking</option>
+                            <option value="Game Play" @(Model != null && string.Equals(Model.SelectedType, "Game Play", StringComparison.OrdinalIgnoreCase) ? "selected" : "")>Game Play</option>
+                        </select>
+                    </div>
+
+                    if (Model != null && !string.Equals(Model.SelectedType, "All", StringComparison.OrdinalIgnoreCase))
+                    {
+                        <div style="padding-top:28px;">
+                            <a class="btn btn-default" href="@Url.Action("History", "StudentSubmissions", new { page = 1, type = "All" })">
+                                Clear Filter
+                            </a>
+                        </div>
+                    }
+                }
+
+                <div>
+                    <a class="btn btn-default" href="@Url.Action("Index", "Student")">Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="empty-state">
+            <h4>No attempts found</h4>
+            <p>No learning history matches the selected filter yet.</p>
+            <a class="btn btn-primary" href="@Url.Action("Index", "Courses")">Browse Courses</a>
+        </div>
+    }
+    else
+    {
+        <div class="history-card">
+            <div class="history-toolbar">
+                @using (Html.BeginForm("History", "StudentSubmissions", FormMethod.Get, new { @class = "history-filter-form" }))
+                {
+                    <div class="history-filter-group">
+                        <label for="type">Filter by type</label>
+                        <select id="type" name="type" onchange="this.form.submit()">
+                            <option value="All" @(string.Equals(Model.SelectedType, "All", StringComparison.OrdinalIgnoreCase) ? "selected" : "")>All</option>
+                            <option value="Quiz" @(string.Equals(Model.SelectedType, "Quiz", StringComparison.OrdinalIgnoreCase) ? "selected" : "")>Quiz</option>
+                            <option value="Speaking" @(string.Equals(Model.SelectedType, "Speaking", StringComparison.OrdinalIgnoreCase) ? "selected" : "")>Speaking</option>
+                            <option value="Game Play" @(string.Equals(Model.SelectedType, "Game Play", StringComparison.OrdinalIgnoreCase) ? "selected" : "")>Game Play</option>
+                        </select>
+                    </div>
+
+                    if (!string.Equals(Model.SelectedType, "All", StringComparison.OrdinalIgnoreCase))
+                    {
+                        <div style="padding-top:28px;">
+                            <a class="btn btn-default" href="@Url.Action("History", "StudentSubmissions", new { page = 1, type = "All" })">
+                                Clear Filter
+                            </a>
+                        </div>
+                    }
+                }
+
+                <div>
+                    <a class="btn btn-default" href="@Url.Action("Index", "Student")">Back to Dashboard</a>
+                </div>
+            </div>
+
+            <div class="muted-small" style="margin-bottom:14px;">
+                Showing @Model.StartItemNumber - @Model.EndItemNumber of @Model.TotalItems attempt(s)
+            </div>
+
+            <table class="table table-striped history-table">
+                <thead>
+                    <tr>
+                        <th>Course / Lesson</th>
+                        <th>Type</th>
+                        <th>Attempt</th>
+                        <th>Summary</th>
+                        <th>Submitted</th>
+                        <th style="width:120px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        var pillClass = item.ExerciseType == "Speaking"
+                            ? "history-pill history-pill-speaking"
+                            : item.ExerciseType == "Game Play"
+                                ? "history-pill history-pill-gameplay"
+                                : "history-pill";
+
+                        <tr>
+                            <td>
+                                <div class="history-course">@item.CourseTitle</div>
+                                <div class="history-lesson">@item.LessonTitle</div>
+
+                                @if (!string.IsNullOrWhiteSpace(item.PromptText) && item.ExerciseType == "Speaking")
+                                {
+                                    <div class="history-prompt">@item.PromptText</div>
+                                }
+                            </td>
+
+                            <td>
+                                <span class="@pillClass">@item.ExerciseType</span>
+                            </td>
+
+                            <td>
+                                <span class="muted-small">#@item.AttemptNumber</span>
+                            </td>
+
+                            <td>
+                                <div class="summary-text">
+                                    @item.SummaryText
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="muted-small">
+                                    @item.AttemptedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")
+                                </span>
+                            </td>
+
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(item.ResultUrl))
+                                {
+                                    <a class="btn btn-primary btn-sm history-action-btn" href="@item.ResultUrl">
+                                        View Result
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="muted-small">N/A</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="history-pagination">
+                <div class="muted-small">
+                    Page @Model.CurrentPage of @Model.TotalPages
+                </div>
+
+                <div class="history-page-links">
+                    @if (Model.CurrentPage > 1)
+                    {
+                        <a class="btn btn-default" href="@Url.Action("History", "StudentSubmissions", new { page = 1, type = Model.SelectedType })">First</a>
+                        <a class="btn btn-default" href="@Url.Action("History", "StudentSubmissions", new { page = Model.CurrentPage - 1, type = Model.SelectedType })">Previous</a>
+                    }
+
+                    @{
+                        var startPage = Model.CurrentPage - 2;
+                        var endPage = Model.CurrentPage + 2;
+
+                        if (startPage < 1)
+                        {
+                            startPage = 1;
+                        }
+
+                        if (endPage > Model.TotalPages)
+                        {
+                            endPage = Model.TotalPages;
+                        }
+                    }
+
+                    @for (var i = startPage; i <= endPage; i++)
+                    {
+                        if (i == Model.CurrentPage)
+                        {
+                            <span class="btn btn-primary disabled">@i</span>
+                        }
+                        else
+                        {
+                            <a class="btn btn-default" href="@Url.Action("History", "StudentSubmissions", new { page = i, type = Model.SelectedType })">@i</a>
+                        }
+                    }
+
+                    @if (Model.CurrentPage < Model.TotalPages)
+                    {
+                        <a class="btn btn-default" href="@Url.Action("History", "StudentSubmissions", new { page = Model.CurrentPage + 1, type = Model.SelectedType })">Next</a>
+                        <a class="btn btn-default" href="@Url.Action("History", "StudentSubmissions", new { page = Model.TotalPages, type = Model.SelectedType })">Last</a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>

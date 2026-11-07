@@ -1,0 +1,68 @@
+﻿@model FluentMY.ViewModels.ExerciseResultViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Quiz Result";
+}
+
+<div class="container">
+    <h2 style="font-weight:900;">Quiz Result</h2>
+    <p class="text-muted">@Model.CourseTitle • @Model.LessonTitle</p>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <p><strong>Attempt:</strong> @Model.AttemptNumber</p>
+            <p><strong>Correct Answers:</strong> @Model.CorrectAnswers / @Model.TotalQuestions</p>
+            <p><strong>Total Score:</strong> @Model.TotalScore</p>
+            <p><strong>Percentage:</strong> @Model.Percentage%</p>
+            <p><strong>Submitted:</strong> @Model.SubmittedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</p>
+        </div>
+    </div>
+
+    <h4>Answer Review</h4>
+    @foreach (var item in Model.Answers)
+    {
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <p><strong>@item.QuestionText</strong></p>
+                <p>Your Answer: @item.SelectedAnswer</p>
+                <p>Correct Answer: @item.CorrectAnswer</p>
+                <p>Score: @item.Score</p>
+
+                @if (item.IsCorrect)
+                {
+                    <span class="label label-success">Correct</span>
+                }
+                else
+                {
+                    <span class="label label-danger">Incorrect</span>
+                }
+            </div>
+        </div>
+    }
+
+    @if (Model.Feedbacks != null && Model.Feedbacks.Any())
+    {
+        <h4>Feedback</h4>
+        foreach (var feedback in Model.Feedbacks)
+        {
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <p>
+                        <strong>@feedback.FeedbackType</strong>
+                        <span class="text-muted">by @feedback.GivenByName on @feedback.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</span>
+                    </p>
+                    <p>@feedback.FeedbackText</p>
+                </div>
+            </div>
+        }
+    }
+
+    @using (Html.BeginForm("Complete", "Lessons", new { id = Model.LessonId }, FormMethod.Post, new { id = "completeLessonForm" }))
+    {
+        @Html.AntiForgeryToken()
+    }
+
+    <a class="btn btn-success" href="javascript:document.getElementById('completeLessonForm').submit();">Finish Lesson</a>
+    <a class="btn btn-default" href="@Url.Action("Index", "StudentSubmissions")">My Submission History</a>
+    <a class="btn btn-default" href="@Url.Action("Details", "Lessons", new { id = Model.LessonId })">Back to Lesson</a>
+</div>

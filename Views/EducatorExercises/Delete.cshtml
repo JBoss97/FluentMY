@@ -1,0 +1,345 @@
+﻿@model FluentMY.Models.Exercise
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Delete Exercise";
+}
+
+@functions {
+    public string GetExerciseTitle(FluentMY.Models.Exercise item)
+    {
+        if (!string.IsNullOrWhiteSpace(item.PromptText))
+        {
+            return item.PromptText;
+        }
+
+        if (!string.IsNullOrWhiteSpace(item.QuestionText))
+        {
+            return item.QuestionText;
+        }
+
+        return "Untitled Exercise";
+    }
+
+    public string GetExerciseTypeLabel(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return "Multiple Choice";
+
+        switch (value.Trim().ToLowerInvariant())
+        {
+            case "multiplechoice": return "Multiple Choice";
+            case "fillblank": return "Fill Blank";
+            case "matching": return "Matching";
+            case "reorder": return "Reorder";
+            case "listeningchoice": return "Listening + Choice";
+            case "speaking": return "Speaking";
+            default: return value;
+        }
+    }
+
+    public string GetAnswerPreview(FluentMY.Models.Exercise item)
+    {
+        var type = (item.ExerciseType ?? "").Trim().ToLowerInvariant();
+
+        if (type == "multiplechoice" || type == "listeningchoice")
+        {
+            return string.IsNullOrWhiteSpace(item.CorrectAnswer) ? "-" : item.CorrectAnswer;
+        }
+
+        if (type == "fillblank")
+        {
+            return string.IsNullOrWhiteSpace(item.CorrectAnswer) ? "-" : item.CorrectAnswer;
+        }
+
+        if (type == "matching")
+        {
+            return string.IsNullOrWhiteSpace(item.MatchingPairsJson) ? "-" : "JSON pairs configured";
+        }
+
+        if (type == "reorder")
+        {
+            return string.IsNullOrWhiteSpace(item.SentenceTokensJson) ? "-" : "JSON tokens configured";
+        }
+
+        if (type == "speaking")
+        {
+            return string.IsNullOrWhiteSpace(item.ReferenceText) ? "-" : item.ReferenceText;
+        }
+
+        return "-";
+    }
+}
+
+<style>
+    .exercise-delete-shell {
+        color: #1f2937;
+    }
+
+    .exercise-delete-hero {
+        border-radius: 22px;
+        background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);
+        color: #fff;
+        padding: 28px;
+        margin-bottom: 24px;
+        box-shadow: 0 16px 35px rgba(220, 53, 69, 0.20);
+    }
+
+        .exercise-delete-hero h2 {
+            margin: 0 0 8px;
+            font-weight: 800;
+        }
+
+        .exercise-delete-hero p {
+            margin: 0;
+            color: rgba(255,255,255,0.88);
+        }
+
+    .exercise-delete-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 24px;
+    }
+
+    .delete-warning {
+        border-radius: 14px;
+        margin-bottom: 20px;
+    }
+
+    .detail-card {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .detail-title {
+        font-size: 20px;
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 14px;
+        line-height: 1.6;
+    }
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+        margin-bottom: 16px;
+    }
+
+    .detail-item {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 14px;
+    }
+
+    .detail-label {
+        font-size: 12px;
+        font-weight: 800;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 6px;
+    }
+
+    .detail-value {
+        color: #111827;
+        font-weight: 600;
+        line-height: 1.6;
+        word-break: break-word;
+    }
+
+    .mini-pill,
+    .type-pill,
+    .area-pill,
+    .status-pill,
+    .marks-pill,
+    .xp-pill,
+    .order-pill {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-right: 6px;
+        margin-bottom: 6px;
+    }
+
+    .type-pill {
+        background: #eff6ff;
+        color: #0d6efd;
+    }
+
+    .area-pill {
+        background: #ecfdf3;
+        color: #15803d;
+    }
+
+    .status-pill.yes {
+        background: #eef2ff;
+        color: #4338ca;
+    }
+
+    .status-pill.no {
+        background: #f3f4f6;
+        color: #4b5563;
+    }
+
+    .marks-pill {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .xp-pill {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .order-pill {
+        background: #f3e8ff;
+        color: #7c3aed;
+    }
+
+    .audio-box {
+        margin-top: 8px;
+        padding: 14px;
+        border-radius: 14px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+    }
+
+        .audio-box audio {
+            width: 100%;
+            margin-top: 8px;
+        }
+
+    .exercise-delete-actions .btn {
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-weight: 600;
+        margin-right: 8px;
+    }
+</style>
+
+<div class="exercise-delete-shell">
+    <div class="exercise-delete-hero">
+        <h2>Delete Exercise</h2>
+        <p>This action will permanently remove the selected exercise if it has not been used in student activity.</p>
+    </div>
+
+    <div class="exercise-delete-card">
+        <div class="alert alert-warning delete-warning">
+            <strong>Are you sure?</strong> This exercise will be permanently deleted and cannot be recovered.
+        </div>
+
+        <div class="detail-card">
+            <div class="detail-title">@GetExerciseTitle(Model)</div>
+
+            <div style="margin-bottom:12px;">
+                <span class="type-pill">@GetExerciseTypeLabel(Model.ExerciseType)</span>
+                <span class="area-pill">@(string.IsNullOrWhiteSpace(Model.PracticeArea) ? "General" : Model.PracticeArea)</span>
+
+                @if (Model.AllowRetry)
+                {
+                    <span class="status-pill yes">Retry Allowed</span>
+                }
+                else
+                {
+                    <span class="status-pill no">Retry Off</span>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.AudioPromptPath))
+                {
+                    <span class="status-pill yes">Audio Uploaded</span>
+                }
+                else
+                {
+                    <span class="status-pill no">No Audio</span>
+                }
+            </div>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Course</div>
+                    <div class="detail-value">@(Model.Lesson != null && Model.Lesson.Course != null ? Model.Lesson.Course.Title : "-")</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Lesson</div>
+                    <div class="detail-value">@(Model.Lesson != null ? Model.Lesson.Title : "-")</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Answer / Data</div>
+                    <div class="detail-value">@GetAnswerPreview(Model)</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Display Order</div>
+                    <div class="detail-value">
+                        <span class="order-pill">@Model.DisplayOrder</span>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Marks</div>
+                    <div class="detail-value">
+                        <span class="marks-pill">@Model.Marks</span>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">XP Reward</div>
+                    <div class="detail-value">
+                        <span class="xp-pill">@Model.XPReward</span>
+                    </div>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.ReferenceText))
+            {
+                <div class="detail-item" style="margin-bottom:14px;">
+                    <div class="detail-label">Speaking Reference Text</div>
+                    <div class="detail-value">@Model.ReferenceText</div>
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.SyllableGuide))
+            {
+                <div class="detail-item" style="margin-bottom:14px;">
+                    <div class="detail-label">Syllable Guide</div>
+                    <div class="detail-value">@Model.SyllableGuide</div>
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.PronunciationHint))
+            {
+                <div class="detail-item" style="margin-bottom:14px;">
+                    <div class="detail-label">Pronunciation Hint</div>
+                    <div class="detail-value">@Model.PronunciationHint</div>
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.AudioPromptPath))
+            {
+                <div class="audio-box">
+                    <div class="detail-label">Current Audio Preview</div>
+                    <audio controls src="@Url.Content(Model.AudioPromptPath)"></audio>
+                </div>
+            }
+        </div>
+
+        @using (Html.BeginForm("Delete", "EducatorExercises", new { id = Model.ExerciseId }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="exercise-delete-actions">
+                <button type="submit" class="btn btn-danger">Delete Exercise</button>
+                <a class="btn btn-default" href="@Url.Action("Index", new { lessonId = Model.LessonId })">Cancel</a>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,178 @@
+﻿@using System.Linq
+@model FluentMY.ViewModels.AdminBulkReassignOwnershipViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Bulk Reassign Ownership";
+}
+
+<style>
+    .page-hero {
+        border-radius: 22px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 28px;
+        margin-bottom: 24px;
+        box-shadow: 0 18px 36px rgba(13, 110, 253, 0.18);
+    }
+
+        .page-hero h2 {
+            margin: 0 0 8px;
+            font-weight: 900;
+        }
+
+        .page-hero p {
+            margin: 0;
+            color: rgba(255,255,255,0.90);
+        }
+
+    .surface-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 22px;
+        margin-bottom: 22px;
+    }
+
+    .section-title {
+        margin-top: 0;
+        margin-bottom: 16px;
+        font-weight: 900;
+        color: #111827;
+    }
+
+    .summary-pill {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        background: #eff6ff;
+        color: #1d4ed8;
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+
+    .table-clean thead th {
+        border-top: none !important;
+        font-weight: 800;
+    }
+
+    .educator-name {
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .educator-email {
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .action-bar .btn {
+        margin-right: 10px;
+        margin-bottom: 8px;
+        border-radius: 12px;
+        font-weight: 700;
+    }
+</style>
+
+<div class="page-hero">
+    <h2>Bulk Reassign Educator Ownership</h2>
+    <p>Move course and lesson ownership from selected educators to one target educator safely.</p>
+</div>
+
+@using (Html.BeginForm("BulkReassignOwnership", "AdminUsers", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    @Html.HiddenFor(m => m.SearchTerm)
+    @Html.HiddenFor(m => m.SelectedRole)
+    @Html.HiddenFor(m => m.EmailConfirmed)
+    @Html.HiddenFor(m => m.SortBy)
+    @Html.HiddenFor(m => m.SortDirection)
+    @Html.HiddenFor(m => m.Page)
+    @Html.HiddenFor(m => m.PageSize)
+
+    if (Model.SourceEducatorIds != null)
+    {
+        for (int i = 0; i < Model.SourceEducatorIds.Count; i++)
+        {
+            @Html.HiddenFor(m => m.SourceEducatorIds[i])
+        }
+    }
+
+    <div class="surface-card">
+        <h3 class="section-title">Selected Educators</h3>
+
+        @if (Model.SourceEducators == null || !Model.SourceEducators.Any())
+        {
+            <div class="alert alert-warning" style="margin-bottom:0;">
+                No educator ownership records found.
+            </div>
+        }
+        else
+        {
+            <div style="margin-bottom:12px;">
+                <span class="summary-pill">@Model.SourceEducators.Count educator(s)</span>
+                <span class="summary-pill">@Model.SourceEducators.Sum(x => x.OwnedCourseCount) course(s)</span>
+                <span class="summary-pill">@Model.SourceEducators.Sum(x => x.OwnedLessonCount) lesson(s)</span>
+            </div>
+
+            <table class="table table-striped table-clean">
+                <thead>
+                    <tr>
+                        <th>Educator</th>
+                        <th>Owned Courses</th>
+                        <th>Owned Lessons</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.SourceEducators)
+                    {
+                        <tr>
+                            <td>
+                                <div class="educator-name">@item.EducatorName</div>
+                                <div class="educator-email">@item.Email</div>
+                            </td>
+                            <td>@item.OwnedCourseCount</td>
+                            <td>@item.OwnedLessonCount</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <div class="surface-card">
+        <h3 class="section-title">Target Educator</h3>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.TargetEducatorId)
+            @Html.DropDownListFor(
+                m => m.TargetEducatorId,
+                Model.AvailableEducators,
+                "-- Select target educator --",
+                new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.TargetEducatorId, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="alert alert-info" style="margin-bottom:18px;">
+            This action will transfer all selected educators' owned courses and lessons to the chosen educator.
+        </div>
+
+        <div class="action-bar">
+            <button type="submit" class="btn btn-primary">Confirm Bulk Reassignment</button>
+            <a href="@Url.Action("Index", "AdminUsers", new {
+                searchTerm = Model.SearchTerm,
+                selectedRole = Model.SelectedRole,
+                emailConfirmed = Model.EmailConfirmed,
+                sortBy = Model.SortBy,
+                sortDirection = Model.SortDirection,
+                page = Model.Page,
+                pageSize = Model.PageSize
+            })" class="btn btn-default">
+                Cancel
+            </a>
+        </div>
+    </div>
+}

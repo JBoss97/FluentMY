@@ -1,0 +1,100 @@
+﻿@model FluentMY.Models.Lesson
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Create Lesson";
+}
+
+<style>
+    .lesson-form-shell {
+        color: #1f2937;
+    }
+
+    .lesson-form-hero {
+        border-radius: 20px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 14px 30px rgba(13, 110, 253, 0.18);
+    }
+
+        .lesson-form-hero h2 {
+            margin: 0 0 8px;
+            font-weight: 800;
+        }
+
+    .lesson-form-card {
+        background: #fff;
+        border-radius: 18px;
+        border: 1px solid rgba(15, 23, 42, 0.06);
+        box-shadow: 0 12px 26px rgba(15, 23, 42, 0.06);
+        padding: 24px;
+    }
+
+        .lesson-form-card .form-group {
+            margin-bottom: 18px;
+        }
+
+        .lesson-form-card .form-control {
+            border-radius: 12px;
+            min-height: 44px;
+        }
+
+    .lesson-actions .btn {
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-weight: 600;
+        margin-right: 8px;
+    }
+</style>
+
+<div class="lesson-form-shell">
+    <div class="lesson-form-hero">
+        <h2>Create Lesson</h2>
+        <p style="margin:0; color: rgba(255,255,255,0.88);">
+            Add a new lesson under one of your available courses.
+        </p>
+    </div>
+
+    <div class="lesson-form-card">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+        }
+
+        @using (Html.BeginForm("Create", "EducatorLessons", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.EducatorId)
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.CourseId)
+                @Html.DropDownListFor(m => m.CourseId, (SelectList)ViewBag.CourseId, "-- Select Course --", new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.CourseId, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Title)
+                @Html.TextBoxFor(m => m.Title, new { @class = "form-control", placeholder = "Enter lesson title" })
+                @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.DifficultyLevel)
+                @Html.TextBoxFor(m => m.DifficultyLevel, new { @class = "form-control", placeholder = "A1 / A2 / B1..." })
+                @Html.ValidationMessageFor(m => m.DifficultyLevel, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Content)
+                @Html.TextAreaFor(m => m.Content, new { @class = "form-control", rows = "10", placeholder = "Write the lesson content here..." })
+                @Html.ValidationMessageFor(m => m.Content, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="lesson-actions">
+                <button class="btn btn-primary" type="submit">Save Lesson</button>
+                <a class="btn btn-default" href="@Url.Action("Index", "EducatorLessons")">Cancel</a>
+            </div>
+        }
+    </div>
+</div>

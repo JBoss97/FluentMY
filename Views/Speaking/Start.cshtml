@@ -1,0 +1,617 @@
+﻿@model FluentMY.ViewModels.SpeakingStartViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Speaking Practice";
+}
+
+<style>
+    .speak-shell {
+        color: #1f2937;
+        max-width: 980px;
+        margin: 0 auto;
+    }
+
+    .speak-hero {
+        border-radius: 24px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 30px;
+        margin-bottom: 24px;
+        box-shadow: 0 18px 36px rgba(13, 110, 253, 0.20);
+    }
+
+        .speak-hero h2 {
+            margin: 0 0 8px;
+            font-weight: 800;
+        }
+
+        .speak-hero p {
+            margin: 0;
+            color: rgba(255,255,255,0.88);
+        }
+
+    .hero-pills {
+        margin-top: 14px;
+    }
+
+    .hero-pill {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.16);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+
+    .speak-card,
+    .result-card,
+    .tips-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        margin-top: 0;
+        margin-bottom: 14px;
+        font-weight: 800;
+        color: #111827;
+    }
+
+    .prompt-box {
+        padding: 18px;
+        border-radius: 16px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        margin-bottom: 18px;
+    }
+
+    .prompt-label {
+        font-size: 12px;
+        font-weight: 800;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 8px;
+    }
+
+    .prompt-text {
+        font-size: 24px;
+        font-weight: 800;
+        color: #111827;
+        line-height: 1.7;
+    }
+
+    .hint-block {
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .hint-line {
+        margin-top: 8px;
+        color: #4b5563;
+        line-height: 1.7;
+    }
+
+    .audio-box {
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        margin-bottom: 18px;
+    }
+
+        .audio-box audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+    .status-banner {
+        border-radius: 14px;
+        padding: 14px 16px;
+        font-weight: 700;
+        margin-bottom: 18px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        color: #374151;
+    }
+
+        .status-banner.is-busy {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: #1d4ed8;
+        }
+
+        .status-banner.is-error {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #b91c1c;
+        }
+
+        .status-banner.is-success {
+            background: #ecfdf3;
+            border-color: #bbf7d0;
+            color: #15803d;
+        }
+
+    .speak-actions .btn {
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-weight: 700;
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+
+    .score-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+    }
+
+    .score-box {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 16px;
+        text-align: center;
+    }
+
+    .score-value {
+        font-size: 30px;
+        font-weight: 800;
+        color: #0d6efd;
+    }
+
+    .score-label {
+        margin-top: 6px;
+        color: #6b7280;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .recognized-box {
+        margin-top: 18px;
+        padding: 16px;
+        border-radius: 14px;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+    }
+
+    .result-summary {
+        margin-top: 16px;
+        font-weight: 700;
+        color: #111827;
+        line-height: 1.8;
+    }
+
+    .result-card {
+        display: none;
+    }
+
+        .result-card.show {
+            display: block;
+        }
+
+    .tips-list {
+        margin: 0;
+        padding-left: 18px;
+        color: #4b5563;
+        line-height: 1.8;
+    }
+
+    .small-muted {
+        color: #6b7280;
+        font-size: 13px;
+        margin-top: 8px;
+    }
+</style>
+
+<div class="speak-shell">
+    <div class="speak-hero">
+        <h2>Speaking Practice</h2>
+        <p>@Model.CourseTitle &nbsp;•&nbsp; @Model.LessonTitle</p>
+
+        <div class="hero-pills">
+            <span class="hero-pill">Pronunciation</span>
+            <span class="hero-pill">Microphone Required</span>
+            <span class="hero-pill">Instant Feedback</span>
+        </div>
+    </div>
+
+    <div class="speak-card">
+        <h3 class="section-title">Practice Prompt</h3>
+
+        <div class="prompt-box">
+            @if (!string.IsNullOrWhiteSpace(Model.PromptText))
+            {
+                <div class="prompt-label">Instruction</div>
+                <div style="margin-bottom:12px; color:#374151; line-height:1.8;">@Model.PromptText</div>
+            }
+
+            <div class="prompt-label">Say this aloud</div>
+            <div class="prompt-text">@Model.ReferenceText</div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.SyllableGuide) || !string.IsNullOrWhiteSpace(Model.PronunciationHint))
+            {
+                <div class="hint-block">
+                    @if (!string.IsNullOrWhiteSpace(Model.SyllableGuide))
+                    {
+                        <div class="hint-line"><strong>Syllable Guide:</strong> @Model.SyllableGuide</div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.PronunciationHint))
+                    {
+                        <div class="hint-line"><strong>Pronunciation Hint:</strong> @Model.PronunciationHint</div>
+                    }
+                </div>
+            }
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.AudioPromptPath))
+        {
+            <div class="audio-box">
+                <strong>Model Pronunciation</strong>
+                <div class="small-muted">Listen first if you want an example before recording yourself.</div>
+                <audio controls src="@Url.Content(Model.AudioPromptPath)"></audio>
+            </div>
+        }
+
+        @using (Html.BeginForm("", "", FormMethod.Post, new { id = "speakingSaveForm" }))
+        {
+            @Html.AntiForgeryToken()
+        }
+
+        <div id="statusBanner" class="status-banner">
+            Click <strong>Start Speaking Assessment</strong> and read the prompt clearly into your microphone.
+        </div>
+
+        <div class="speak-actions">
+            <button type="button" id="startAssessmentBtn" class="btn btn-primary">Start Speaking Assessment</button>
+            <button type="button" id="retryBtn" class="btn btn-warning" style="display:none;">Try Again</button>
+            <button type="button" id="saveBtn" class="btn btn-success" style="display:none;">Save Result</button>
+            <a class="btn btn-default" href="@Url.Action("Details", "Lessons", new { id = Model.LessonId })">Back to Lesson</a>
+        </div>
+
+        <div class="small-muted">
+            Use a quiet environment and speak naturally for better recognition results.
+        </div>
+    </div>
+
+    <div id="resultCard" class="result-card">
+        <h3 class="section-title">Assessment Preview</h3>
+
+        <div class="score-grid">
+            <div class="score-box">
+                <div class="score-value" id="accuracyScore">0</div>
+                <div class="score-label">Accuracy</div>
+            </div>
+
+            <div class="score-box">
+                <div class="score-value" id="fluencyScore">-</div>
+                <div class="score-label">Fluency (N/A)</div>
+            </div>
+
+            <div class="score-box">
+                <div class="score-value" id="completenessScore">0</div>
+                <div class="score-label">Completeness</div>
+            </div>
+
+            <div class="score-box">
+                <div class="score-value" id="pronunciationScore">0</div>
+                <div class="score-label">Pronunciation</div>
+            </div>
+        </div>
+
+        <div class="recognized-box">
+            <strong>Recognized Speech</strong>
+            <div id="recognizedText" style="margin-top:8px; line-height:1.8;">-</div>
+        </div>
+
+        <div id="resultSummary" class="result-summary"></div>
+    </div>
+
+    <div class="tips-card">
+        <h3 class="section-title">Tips for Better Results</h3>
+        <ul class="tips-list">
+            <li>Speak at a natural pace, not too fast and not too slowly.</li>
+            <li>Pronounce each word clearly, especially difficult syllables.</li>
+            <li>Stay close enough to the microphone for a clean recording.</li>
+            <li>Listen to the model pronunciation first when available.</li>
+        </ul>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        (function () {
+            var startBtn = document.getElementById("startAssessmentBtn");
+            var retryBtn = document.getElementById("retryBtn");
+            var saveBtn = document.getElementById("saveBtn");
+            var statusBanner = document.getElementById("statusBanner");
+            var resultCard = document.getElementById("resultCard");
+
+            var recognizedTextEl = document.getElementById("recognizedText");
+            var accuracyScoreEl = document.getElementById("accuracyScore");
+            var fluencyScoreEl = document.getElementById("fluencyScore");
+            var completenessScoreEl = document.getElementById("completenessScore");
+            var pronunciationScoreEl = document.getElementById("pronunciationScore");
+            var resultSummaryEl = document.getElementById("resultSummary");
+
+            var antiForgeryToken = document.querySelector('#speakingSaveForm input[name="__RequestVerificationToken"]');
+            var savedResult = null;
+            var recognition = null;
+            var isRecognitionSupported = false;
+
+            var exerciseId = @Model.ExerciseId;
+            var lessonId = @Model.LessonId;
+            var referenceText = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ReferenceText ?? ""));
+            var speechLocale = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.SpeechLocale ?? "en-US"));
+
+            function setStatus(message, stateClass) {
+                statusBanner.className = "status-banner";
+                if (stateClass) {
+                    statusBanner.classList.add(stateClass);
+                }
+                statusBanner.innerHTML = message;
+            }
+
+            function setBusyState(isBusy) {
+                startBtn.disabled = isBusy || !isRecognitionSupported;
+                retryBtn.disabled = isBusy;
+                saveBtn.disabled = isBusy;
+
+                startBtn.innerText = isBusy ? "Listening..." : "Start Speaking Assessment";
+            }
+
+            function resetResultUI() {
+                savedResult = null;
+                resultCard.classList.remove("show");
+                saveBtn.style.display = "none";
+                retryBtn.style.display = "none";
+                recognizedTextEl.innerText = "-";
+                accuracyScoreEl.innerText = "0";
+                fluencyScoreEl.innerText = "-";
+                completenessScoreEl.innerText = "0";
+                pronunciationScoreEl.innerText = "0";
+                resultSummaryEl.innerText = "";
+            }
+
+            function normalizeText(text) {
+                if (!text) return "";
+
+                return text
+                    .toLowerCase()
+                    .replace(/[.,!?;:"'()\-\[\]{}]/g, " ")
+                    .replace(/\s+/g, " ")
+                    .trim();
+            }
+
+            function compareTexts(expected, actual) {
+                var expectedWords = normalizeText(expected).split(" ").filter(Boolean);
+                var actualWords = normalizeText(actual).split(" ").filter(Boolean);
+
+                var usedIndexes = {};
+                var missingWords = [];
+                var extraWords = [];
+                var matchedCount = 0;
+
+                for (var i = 0; i < expectedWords.length; i++) {
+                    var found = false;
+
+                    for (var j = 0; j < actualWords.length; j++) {
+                        if (!usedIndexes[j] && expectedWords[i] === actualWords[j]) {
+                            usedIndexes[j] = true;
+                            matchedCount++;
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found) {
+                        missingWords.push(expectedWords[i]);
+                    }
+                }
+
+                for (var k = 0; k < actualWords.length; k++) {
+                    if (!usedIndexes[k]) {
+                        extraWords.push(actualWords[k]);
+                    }
+                }
+
+                var completenessScore = expectedWords.length === 0
+                    ? 0
+                    : Math.round((matchedCount / expectedWords.length) * 100);
+
+                var maxLength = Math.max(expectedWords.length, actualWords.length);
+                var accuracyScore = maxLength === 0
+                    ? 0
+                    : Math.round((matchedCount / maxLength) * 100);
+
+                var pronunciationScore = accuracyScore;
+
+                return {
+                    recognizedText: actual || "",
+                    accuracyScore: accuracyScore,
+                    fluencyScore: null,
+                    completenessScore: completenessScore,
+                    pronunciationScore: pronunciationScore,
+                    missingWords: missingWords,
+                    extraWords: extraWords
+                };
+            }
+
+            function buildSummary(result) {
+                var overall = 0;
+                var count = 0;
+
+                if (result.accuracyScore != null) { overall += result.accuracyScore; count++; }
+                if (result.completenessScore != null) { overall += result.completenessScore; count++; }
+                if (result.pronunciationScore != null) { overall += result.pronunciationScore; count++; }
+
+                overall = count === 0 ? 0 : Math.round(overall / count);
+
+                var summary = "";
+                if (overall >= 85) {
+                    summary = "Excellent attempt. Your spoken result closely matches the reference text.";
+                } else if (overall >= 70) {
+                    summary = "Good job. Most words were recognized correctly.";
+                } else if (overall >= 50) {
+                    summary = "Fair attempt. Try again and pronounce each word more clearly.";
+                } else {
+                    summary = "Keep practicing. Speak slowly and clearly, then try again.";
+                }
+
+                if (result.missingWords && result.missingWords.length > 0) {
+                    summary += " Missing words: " + result.missingWords.join(", ") + ".";
+                }
+
+                if (result.extraWords && result.extraWords.length > 0) {
+                    summary += " Extra words: " + result.extraWords.join(", ") + ".";
+                }
+
+                return summary;
+            }
+
+            function showResult(result) {
+                savedResult = result;
+
+                accuracyScoreEl.innerText = result.accuracyScore != null ? result.accuracyScore : 0;
+                fluencyScoreEl.innerText = "-";
+                completenessScoreEl.innerText = result.completenessScore != null ? result.completenessScore : 0;
+                pronunciationScoreEl.innerText = result.pronunciationScore != null ? result.pronunciationScore : 0;
+
+                recognizedTextEl.innerText = result.recognizedText && result.recognizedText.trim() !== ""
+                    ? result.recognizedText
+                    : "No speech was clearly recognized.";
+
+                resultSummaryEl.innerText = buildSummary(result);
+
+                resultCard.classList.add("show");
+                retryBtn.style.display = "inline-block";
+                saveBtn.style.display = "inline-block";
+            }
+
+            function initSpeechRecognition() {
+                var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+                if (!SpeechRecognition) {
+                    isRecognitionSupported = false;
+                    setStatus("Speech recognition is not supported in this browser. Please use Google Chrome or another supported browser.", "is-error");
+                    startBtn.disabled = true;
+                    retryBtn.disabled = true;
+                    saveBtn.disabled = true;
+                    return;
+                }
+
+                isRecognitionSupported = true;
+                recognition = new SpeechRecognition();
+                recognition.lang = speechLocale || "en-US";
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.onresult = function (event) {
+                    var transcript = "";
+
+                    if (event.results && event.results.length > 0 && event.results[0].length > 0) {
+                        transcript = event.results[0][0].transcript || "";
+                    }
+
+                    var result = compareTexts(referenceText, transcript);
+                    showResult(result);
+                    setStatus("Assessment completed. Review your result, then save it.", "is-success");
+                    setBusyState(false);
+                };
+
+                recognition.onerror = function (event) {
+                    var message = "Speaking assessment failed. Please allow microphone access and try again.";
+
+                    if (event && event.error === "not-allowed") {
+                        message = "Microphone permission was denied. Please allow microphone access and try again.";
+                    } else if (event && event.error === "no-speech") {
+                        message = "No speech was detected. Please speak clearly and try again.";
+                    } else if (event && event.error === "audio-capture") {
+                        message = "No microphone was detected. Please check your microphone and try again.";
+                    }
+
+                    setStatus(message, "is-error");
+                    setBusyState(false);
+                };
+
+                recognition.onend = function () {
+                    setBusyState(false);
+                };
+            }
+
+            function startAssessment() {
+                if (!isRecognitionSupported || !recognition) {
+                    setStatus("Speech recognition is not available in this browser.", "is-error");
+                    return;
+                }
+
+                resetResultUI();
+                setBusyState(true);
+                setStatus("Listening... Please read the prompt clearly into your microphone.", "is-busy");
+
+                try {
+                    recognition.start();
+                } catch (e) {
+                    setStatus("Unable to start speech recognition. Please try again.", "is-error");
+                    setBusyState(false);
+                }
+            }
+
+            async function saveAttempt() {
+                if (!savedResult) return;
+
+                setBusyState(true);
+                setStatus("Saving speaking result...", "is-busy");
+
+                try {
+                    var body = new URLSearchParams();
+                    body.append("__RequestVerificationToken", antiForgeryToken.value);
+                    body.append("ExerciseId", exerciseId);
+                    body.append("LessonId", lessonId);
+                    body.append("RecognizedText", savedResult.recognizedText || "");
+                    body.append("ReferenceText", referenceText || "");
+
+                    var response = await fetch('@Url.Action("SaveAttempt", "Speaking")', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                        },
+                        body: body.toString(),
+                        credentials: 'same-origin'
+                    });
+
+                    var data = await response.json();
+
+                    if (data && data.success && data.redirectUrl) {
+                        window.location.href = data.redirectUrl;
+                        return;
+                    }
+
+                    setStatus(data && data.message ? data.message : "Unable to save result.", "is-error");
+                } catch (e) {
+                    setStatus("An error occurred while saving the result.", "is-error");
+                }
+
+                setBusyState(false);
+            }
+
+            initSpeechRecognition();
+
+            startBtn.addEventListener("click", startAssessment);
+            retryBtn.addEventListener("click", startAssessment);
+            saveBtn.addEventListener("click", saveAttempt);
+        })();
+    </script>
+}

@@ -1,0 +1,560 @@
+﻿@model FluentMY.ViewModels.LessonPlayViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Play Lesson";
+
+    var progressPercent = Model.TotalQuestions == 0
+        ? 0
+        : (int)Math.Round(((Model.CurrentIndex - 1) * 100.0) / Model.TotalQuestions);
+
+    var progressStyle = "width:" + progressPercent + "%;";
+    var exerciseType = (Model.CurrentExercise != null && !string.IsNullOrWhiteSpace(Model.CurrentExercise.ExerciseType))
+        ? Model.CurrentExercise.ExerciseType.Trim().ToLowerInvariant()
+        : "multiplechoice";
+}
+
+<style>
+    .play-shell {
+        color: #1f2937;
+    }
+
+    .play-hero {
+        border-radius: 24px;
+        background: linear-gradient(135deg,#0d6efd 0%,#0b4db7 100%);
+        color: #fff;
+        padding: 28px;
+        margin-bottom: 22px;
+        box-shadow: 0 18px 36px rgba(13,110,253,0.20);
+    }
+
+        .play-hero h2 {
+            margin: 0 0 6px;
+            font-weight: 800;
+        }
+
+    .play-meta {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+    }
+
+    .meta-pill {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        background: rgba(255,255,255,0.16);
+        color: #fff;
+    }
+
+    .play-card,
+    .feedback-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+
+    .progress {
+        height: 14px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: #e5e7eb;
+        margin-top: 14px;
+        margin-bottom: 0;
+    }
+
+    .question-title {
+        font-weight: 800;
+        font-size: 24px;
+        margin-top: 0;
+        margin-bottom: 16px;
+        color: #111827;
+    }
+
+    .option-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .option-btn {
+        width: 100%;
+        text-align: left;
+        background: #fff;
+        border: 1px solid #dbe3ef;
+        border-radius: 16px;
+        padding: 14px 16px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+        .option-btn:hover,
+        .option-btn.active {
+            border-color: #0d6efd;
+            background: #eff6ff;
+            color: #0b4db7;
+        }
+
+    .multi-option {
+        border: 1px solid #dbe3ef;
+        border-radius: 16px;
+        padding: 14px 16px;
+        background: #fff;
+        margin-bottom: 12px;
+    }
+
+        .multi-option label {
+            display: block;
+            margin: 0;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+    .answer-box {
+        border-radius: 14px;
+        min-height: 48px;
+    }
+
+    .play-actions .btn {
+        border-radius: 12px;
+        font-weight: 700;
+        padding: 10px 16px;
+        margin-right: 8px;
+        margin-top: 12px;
+    }
+
+    .feedback-card {
+        display: none;
+    }
+
+        .feedback-card.show {
+            display: block;
+        }
+
+        .feedback-card.correct {
+            border-left: 5px solid #16a34a;
+        }
+
+        .feedback-card.wrong {
+            border-left: 5px solid #dc2626;
+        }
+
+    .feedback-extra {
+        margin-top: 10px;
+        color: #4b5563;
+    }
+
+    .matching-row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+    }
+
+    .matching-left {
+        min-width: 160px;
+        font-weight: 700;
+        color: #111827;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        padding: 10px 12px;
+        border-radius: 12px;
+    }
+
+    .matching-select {
+        max-width: 280px;
+        border-radius: 12px;
+    }
+
+    .reorder-box {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 14px;
+    }
+
+    .reorder-token {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+        border: 1px solid #dbe3ef;
+        border-radius: 12px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+    }
+
+    .reorder-token-text {
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .reorder-actions button {
+        margin-left: 6px;
+        border-radius: 10px;
+    }
+
+    .audio-box {
+        margin-bottom: 16px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+    }
+
+    .helper-note {
+        color: #6b7280;
+        font-size: 13px;
+        margin-top: 10px;
+    }
+</style>
+
+<div class="play-shell">
+    <div class="play-hero">
+        <h2>@Model.LessonTitle</h2>
+        <div>@Model.CourseTitle</div>
+
+        <div class="play-meta">
+            <span class="meta-pill">Question @Model.CurrentIndex / @Model.TotalQuestions</span>
+            <span class="meta-pill">❤️ Hearts: @Model.HeartsRemaining</span>
+            <span class="meta-pill">🔥 Streak: @Model.CurrentStreak</span>
+            <span class="meta-pill">⭐ XP: @Model.EarnedXP</span>
+        </div>
+
+        <div class="progress">
+            <div class="progress-bar progress-bar-success" style="@progressStyle"></div>
+        </div>
+    </div>
+
+    <div class="play-card">
+        @if (Model.CurrentExercise == null)
+        {
+            <div class="alert alert-warning" style="margin-bottom:0;">
+                No exercise is available for this session.
+            </div>
+        }
+        else
+        {
+            <h3 class="question-title">@Model.CurrentExercise.PromptText</h3>
+
+            using (Html.BeginForm("", "", FormMethod.Post, new { id = "lessonAnswerForm" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" id="SessionId" value="@Model.SessionId" />
+                <input type="hidden" id="ExerciseId" value="@Model.CurrentExercise.ExerciseId" />
+                <input type="hidden" id="Answer" value="" />
+                <input type="hidden" id="AnswerJson" value="" />
+
+                if (exerciseType == "multiplechoice" || exerciseType == "listeningchoice")
+                {
+                    if (!string.IsNullOrWhiteSpace(Model.CurrentExercise.AudioPromptPath))
+                    {
+                        <div class="audio-box">
+                            <strong>Listen:</strong><br />
+                            <audio controls src="@Url.Content(Model.CurrentExercise.AudioPromptPath)"></audio>
+                        </div>
+                    }
+
+                    <div class="option-grid">
+                        @foreach (var option in Model.CurrentExercise.Options)
+                        {
+                            <button type="button" class="option-btn" data-value="@option.Value">
+                                @option.Text
+                            </button>
+                        }
+                    </div>
+
+                    <div class="helper-note">Choose the best answer, then click Check.</div>
+                }
+                else if (exerciseType == "multipleselect")
+                {
+                    <div class="option-grid">
+                        @foreach (var option in Model.CurrentExercise.Options)
+                        {
+                            <div class="multi-option">
+                                <label>
+                                    <input type="checkbox" name="multiChoiceAnswer" value="@option.Value" />
+                                    <strong>@option.Value.</strong> @option.Text
+                                </label>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="helper-note">Choose all correct answers, then click Check.</div>
+                }
+                else if (exerciseType == "fillblank")
+                {
+                    <input type="text"
+                           id="fillBlankInput"
+                           class="form-control answer-box"
+                           placeholder="Type your answer here" />
+
+                    <div class="helper-note">Type the missing word or phrase, then click Check.</div>
+                }
+                else if (exerciseType == "matching")
+                {
+                    @Html.Hidden("MatchingPairsJsonSource", Model.CurrentExercise.MatchingPairsJson, new { id = "MatchingPairsJsonSource" })
+                    <div id="matchingContainer"></div>
+
+                    <div class="helper-note">Match each left item with the correct right item.</div>
+                }
+                else if (exerciseType == "reorder")
+                {
+                    @Html.Hidden("SentenceTokensJsonSource", Model.CurrentExercise.SentenceTokensJson, new { id = "SentenceTokensJsonSource" })
+                    <div class="reorder-box">
+                        <div id="reorderContainer"></div>
+                    </div>
+
+                    <div class="helper-note">Rearrange the tokens into the correct sentence order.</div>
+                }
+                else
+                {
+                    <div class="alert alert-warning">
+                        This exercise type is not supported in Lesson Play yet.
+                    </div>
+                }
+
+                <div class="play-actions">
+                    <button type="submit" class="btn btn-primary">Check</button>
+                    <a class="btn btn-default" href="@Url.Action("Details", "Lessons", new { id = Model.LessonId })">Exit Lesson</a>
+                </div>
+            }
+        }
+    </div>
+
+    <div id="feedbackCard" class="feedback-card">
+        <h4 id="feedbackTitle"></h4>
+        <div id="feedbackText"></div>
+        <div id="feedbackExtra" class="feedback-extra"></div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+    (function () {
+        var form = document.getElementById("lessonAnswerForm");
+        if (!form) return;
+
+        var answerInput = document.getElementById("Answer");
+        var answerJsonInput = document.getElementById("AnswerJson");
+        var fillBlankInput = document.getElementById("fillBlankInput");
+        var feedbackCard = document.getElementById("feedbackCard");
+        var feedbackTitle = document.getElementById("feedbackTitle");
+        var feedbackText = document.getElementById("feedbackText");
+        var feedbackExtra = document.getElementById("feedbackExtra");
+
+        function shuffle(array) {
+            var arr = array.slice();
+            for (var i = arr.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+            return arr;
+        }
+
+        function renderMatching() {
+            var raw = document.getElementById("MatchingPairsJsonSource");
+            var container = document.getElementById("matchingContainer");
+            if (!raw || !container) return;
+
+            var pairs;
+            try {
+                pairs = JSON.parse(raw.value || "{}");
+            } catch (e) {
+                container.innerHTML = '<div class="alert alert-warning">Matching data is invalid.</div>';
+                return;
+            }
+
+            var keys = Object.keys(pairs);
+            var values = keys.map(function (k) { return pairs[k]; });
+            var shuffledValues = shuffle(values);
+
+            function updateHidden() {
+                var result = {};
+                var selects = container.querySelectorAll("select[data-left]");
+                for (var i = 0; i < selects.length; i++) {
+                    var left = selects[i].getAttribute("data-left");
+                    result[left] = selects[i].value || "";
+                }
+                answerJsonInput.value = JSON.stringify(result);
+            }
+
+            var html = "";
+            for (var i = 0; i < keys.length; i++) {
+                html += '<div class="matching-row">';
+                html += '<div class="matching-left">' + keys[i] + '</div>';
+                html += '<select class="form-control matching-select" data-left="' + keys[i] + '">';
+                html += '<option value="">-- Select match --</option>';
+                for (var j = 0; j < shuffledValues.length; j++) {
+                    html += '<option value="' + shuffledValues[j] + '">' + shuffledValues[j] + '</option>';
+                }
+                html += '</select></div>';
+            }
+
+            container.innerHTML = html;
+
+            var dropdowns = container.querySelectorAll("select[data-left]");
+            for (var d = 0; d < dropdowns.length; d++) {
+                dropdowns[d].addEventListener("change", updateHidden);
+            }
+
+            updateHidden();
+        }
+
+        function renderReorder() {
+            var raw = document.getElementById("SentenceTokensJsonSource");
+            var container = document.getElementById("reorderContainer");
+            if (!raw || !container) return;
+
+            var tokens;
+            try {
+                tokens = JSON.parse(raw.value || "[]");
+            } catch (e) {
+                container.innerHTML = '<div class="alert alert-warning">Sentence reorder data is invalid.</div>';
+                return;
+            }
+
+            var currentTokens = shuffle(tokens);
+
+            function updateHidden() {
+                answerJsonInput.value = JSON.stringify(currentTokens);
+            }
+
+            function render() {
+                var html = "";
+                for (var i = 0; i < currentTokens.length; i++) {
+                    html += '<div class="reorder-token">';
+                    html += '<div class="reorder-token-text">' + currentTokens[i] + '</div>';
+                    html += '<div class="reorder-actions">';
+                    html += '<button type="button" class="btn btn-default btn-xs move-up" data-index="' + i + '">↑</button>';
+                    html += '<button type="button" class="btn btn-default btn-xs move-down" data-index="' + i + '">↓</button>';
+                    html += '</div></div>';
+                }
+
+                container.innerHTML = html;
+
+                var upButtons = container.querySelectorAll(".move-up");
+                var downButtons = container.querySelectorAll(".move-down");
+
+                for (var u = 0; u < upButtons.length; u++) {
+                    upButtons[u].addEventListener("click", function () {
+                        var index = parseInt(this.getAttribute("data-index"));
+                        if (index > 0) {
+                            var temp = currentTokens[index - 1];
+                            currentTokens[index - 1] = currentTokens[index];
+                            currentTokens[index] = temp;
+                            render();
+                            updateHidden();
+                        }
+                    });
+                }
+
+                for (var d = 0; d < downButtons.length; d++) {
+                    downButtons[d].addEventListener("click", function () {
+                        var index = parseInt(this.getAttribute("data-index"));
+                        if (index < currentTokens.length - 1) {
+                            var temp = currentTokens[index + 1];
+                            currentTokens[index + 1] = currentTokens[index];
+                            currentTokens[index] = temp;
+                            render();
+                            updateHidden();
+                        }
+                    });
+                }
+            }
+
+            render();
+            updateHidden();
+        }
+
+        var optionButtons = document.querySelectorAll(".option-btn");
+        for (var i = 0; i < optionButtons.length; i++) {
+            optionButtons[i].addEventListener("click", function () {
+                for (var j = 0; j < optionButtons.length; j++) {
+                    optionButtons[j].classList.remove("active");
+                }
+                this.classList.add("active");
+                answerInput.value = this.getAttribute("data-value");
+            });
+        }
+
+        renderMatching();
+        renderReorder();
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            if (fillBlankInput) {
+                answerInput.value = fillBlankInput.value || "";
+            }
+
+            var token = form.querySelector('input[name="__RequestVerificationToken"]').value;
+            var multiChoiceChecks = document.querySelectorAll('input[name="multiChoiceAnswer"]:checked');
+            var selectedAnswers = [];
+
+            for (var i = 0; i < multiChoiceChecks.length; i++) {
+                selectedAnswers.push(multiChoiceChecks[i].value);
+            }
+
+            selectedAnswers.sort();
+
+            var body = "__RequestVerificationToken=" + encodeURIComponent(token)
+                + "&SessionId=" + encodeURIComponent(document.getElementById("SessionId").value)
+                + "&ExerciseId=" + encodeURIComponent(document.getElementById("ExerciseId").value)
+                + "&Answer=" + encodeURIComponent(answerInput.value || "")
+                + "&AnswerJson=" + encodeURIComponent(answerJsonInput.value || "");
+
+            for (var s = 0; s < selectedAnswers.length; s++) {
+                body += "&SelectedAnswers=" + encodeURIComponent(selectedAnswers[s]);
+            }
+
+            fetch('@Url.Action("SubmitAnswer", "LessonPlay")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                },
+                body: body
+            })
+            .then(function (r) {
+                return r.json();
+            })
+            .then(function (data) {
+                feedbackCard.classList.add("show");
+                feedbackCard.classList.remove("correct", "wrong");
+
+                if (data.isCorrect) {
+                    feedbackCard.classList.add("correct");
+                    feedbackTitle.innerText = "Correct!";
+                } else {
+                    feedbackCard.classList.add("wrong");
+                    feedbackTitle.innerText = "Not quite.";
+                }
+
+                feedbackText.innerText = data.feedbackText || "";
+                feedbackExtra.innerText = data.correctAnswer
+                    ? ("Correct answer: " + data.correctAnswer)
+                    : "";
+
+                setTimeout(function () {
+                    window.location.href = data.redirectUrl;
+                }, 1000);
+            })
+            .catch(function () {
+                feedbackCard.classList.add("show", "wrong");
+                feedbackTitle.innerText = "Something went wrong.";
+                feedbackText.innerText = "Unable to submit this answer. Please try again.";
+                feedbackExtra.innerText = "";
+            });
+        });
+    })();
+    </script>
+}

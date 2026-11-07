@@ -1,0 +1,59 @@
+﻿@model FluentMY.ViewModels.LessonExerciseViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Lesson Quiz";
+}
+
+<div class="container">
+    <h2 style="font-weight:900;">@Model.LessonTitle - Quiz</h2>
+    <p class="text-muted">@Model.CourseTitle</p>
+
+    @if (Model.Exercises == null || !Model.Exercises.Any())
+    {
+        <div class="alert alert-warning">No exercises available for this lesson yet.</div>
+        <a class="btn btn-default" href="@Url.Action("Details", "Lessons", new { id = Model.LessonId })">Back to Lesson</a>
+    }
+    else
+    {
+        using (Html.BeginForm("Submit", "Exercises", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.LessonId)
+            @Html.HiddenFor(m => m.LessonTitle)
+            @Html.HiddenFor(m => m.CourseTitle)
+
+            for (int i = 0; i < Model.Exercises.Count; i++)
+            {
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <h4>Question @(i + 1)</h4>
+                        <p><strong>@Model.Exercises[i].QuestionText</strong></p>
+
+                        @Html.HiddenFor(m => m.Exercises[i].ExerciseId)
+                        @Html.HiddenFor(m => m.Exercises[i].QuestionText)
+                        @Html.HiddenFor(m => m.Exercises[i].OptionA)
+                        @Html.HiddenFor(m => m.Exercises[i].OptionB)
+                        @Html.HiddenFor(m => m.Exercises[i].OptionC)
+                        @Html.HiddenFor(m => m.Exercises[i].OptionD)
+
+                        <div class="radio">
+                            <label>@Html.RadioButtonFor(m => m.Exercises[i].SelectedAnswer, "A") A. @Model.Exercises[i].OptionA</label>
+                        </div>
+                        <div class="radio">
+                            <label>@Html.RadioButtonFor(m => m.Exercises[i].SelectedAnswer, "B") B. @Model.Exercises[i].OptionB</label>
+                        </div>
+                        <div class="radio">
+                            <label>@Html.RadioButtonFor(m => m.Exercises[i].SelectedAnswer, "C") C. @Model.Exercises[i].OptionC</label>
+                        </div>
+                        <div class="radio">
+                            <label>@Html.RadioButtonFor(m => m.Exercises[i].SelectedAnswer, "D") D. @Model.Exercises[i].OptionD</label>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <button type="submit" class="btn btn-primary">Submit Quiz</button>
+            <a class="btn btn-default" href="@Url.Action("Details", "Lessons", new { id = Model.LessonId })">Back</a>
+        }
+    }
+</div>

@@ -1,0 +1,375 @@
+﻿@model FluentMY.ViewModels.AdminCourseIndexViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Manage Courses";
+}
+
+<style>
+    .admin-hero {
+        background: linear-gradient(135deg, #0f4c81 0%, #3a7bd5 100%);
+        color: #fff;
+        border-radius: 18px;
+        padding: 32px;
+        margin-bottom: 24px;
+        box-shadow: 0 14px 35px rgba(15, 76, 129, 0.18);
+    }
+
+        .admin-hero h1 {
+            margin-top: 0;
+            font-weight: 700;
+        }
+
+        .admin-hero p {
+            margin-bottom: 0;
+            opacity: 0.95;
+        }
+
+    .surface-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 18px 20px;
+        box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+        margin-bottom: 20px;
+        min-height: 120px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #6b7280;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+
+    .stat-note {
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .page-title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+
+        .page-title-row h3 {
+            margin: 0;
+            font-weight: 700;
+            color: #111827;
+        }
+
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    .table.admin-table {
+        margin-bottom: 0;
+    }
+
+        .table.admin-table thead th {
+            border-top: none;
+            color: #4b5563;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+    .course-title {
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+
+    .course-desc {
+        color: #6b7280;
+        font-size: 13px;
+        line-height: 1.5;
+        max-width: 420px;
+    }
+
+    .pill {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .pill-blue {
+        background: #e0f2fe;
+        color: #075985;
+    }
+
+    .pill-green {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .pill-amber {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .pill-gray {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .course-actions .btn {
+        margin-right: 6px;
+        margin-bottom: 6px;
+    }
+
+    .filter-actions {
+        margin-top: 24px;
+    }
+
+    .pagination-wrap {
+        margin-top: 18px;
+        text-align: right;
+    }
+
+    .empty-state {
+        padding: 28px;
+        text-align: center;
+        color: #6b7280;
+    }
+</style>
+
+<div class="admin-hero">
+    <h1>Manage Courses</h1>
+    <p>
+        Review course ownership, engagement, lesson structure, and submission activity across the FluentMY platform.
+    </p>
+</div>
+
+<div class="row">
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+            <div class="stat-label">Total Courses</div>
+            <div class="stat-value">@Model.TotalCourses</div>
+            <div class="stat-note">Courses in the current filtered result.</div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+            <div class="stat-label">Lessons</div>
+            <div class="stat-value">@Model.TotalLessons</div>
+            <div class="stat-note">All linked lesson records.</div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+            <div class="stat-label">Enrollments</div>
+            <div class="stat-value">@Model.TotalEnrollments</div>
+            <div class="stat-note">Student enrollments under these courses.</div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+            <div class="stat-label">Submissions</div>
+            <div class="stat-value">@Model.TotalSubmissions</div>
+            <div class="stat-note">Quiz and exercise submission activity.</div>
+        </div>
+    </div>
+</div>
+
+<div class="surface-card">
+    <div class="page-title-row">
+        <h3>Filters and Search</h3>
+    </div>
+
+    @using (Html.BeginForm("Index", "AdminCourses", FormMethod.Get))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="search">Search</label>
+                    <input type="text"
+                           id="search"
+                           name="search"
+                           value="@Model.Search"
+                           class="form-control"
+                           placeholder="Search by course title or description" />
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="educatorId">Educator</label>
+                    <select id="educatorId" name="educatorId" class="form-control">
+                        <option value="">All educators</option>
+                        @foreach (var educator in Model.Educators)
+                        {
+                            <option value="@educator.Value" @(educator.Selected ? "selected" : null)>
+                                @educator.Text
+                            </option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="sort">Sort By</label>
+                    <select id="sort" name="sort" class="form-control">
+                        <option value="title_asc" @(Model.Sort == "title_asc" ? "selected" : null)>Title (A-Z)</option>
+                        <option value="title_desc" @(Model.Sort == "title_desc" ? "selected" : null)>Title (Z-A)</option>
+                        <option value="educator_asc" @(Model.Sort == "educator_asc" ? "selected" : null)>Educator (A-Z)</option>
+                        <option value="educator_desc" @(Model.Sort == "educator_desc" ? "selected" : null)>Educator (Z-A)</option>
+                        <option value="lessons_desc" @(Model.Sort == "lessons_desc" ? "selected" : null)>Most Lessons</option>
+                        <option value="enrollments_desc" @(Model.Sort == "enrollments_desc" ? "selected" : null)>Most Enrollments</option>
+                        <option value="submissions_desc" @(Model.Sort == "submissions_desc" ? "selected" : null)>Most Submissions</option>
+                        <option value="score_desc" @(Model.Sort == "score_desc" ? "selected" : null)>Highest Average Score</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-2 filter-actions">
+                <button type="submit" class="btn btn-primary btn-block">Apply</button>
+                @Html.ActionLink("Reset", "Index", "AdminCourses", null, new { @class = "btn btn-default btn-block", style = "margin-top:8px;" })
+            </div>
+        </div>
+    }
+</div>
+
+<div class="surface-card">
+    <div class="page-title-row">
+        <h3>Course Oversight</h3>
+        <span class="pill pill-gray">Page @Model.Page of @Model.TotalPages</span>
+    </div>
+
+    @if (Model.Courses != null && Model.Courses.Any())
+    {
+        <div class="table-wrap">
+            <table class="table table-hover admin-table">
+                <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>Educator</th>
+                        <th>Lessons</th>
+                        <th>Exercises</th>
+                        <th>Enrollments</th>
+                        <th>Submissions</th>
+                        <th>Avg. Score</th>
+                        <th style="min-width:180px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Courses)
+                    {
+                        <tr>
+                            <td>
+                                <div class="course-title">@item.Title</div>
+                                <div class="course-desc">
+                                    @(string.IsNullOrWhiteSpace(item.Description)
+                                        ? "No description provided."
+                                        : item.Description.Length > 110
+                                            ? item.Description.Substring(0, 110) + "..."
+                                            : item.Description)
+                                </div>
+                            </td>
+
+                            <td>
+                                @if (string.IsNullOrWhiteSpace(item.EducatorId))
+                                {
+                                    <span class="pill pill-amber">Unassigned</span>
+                                }
+                                else
+                                {
+                                    <span class="pill pill-blue">@item.EducatorName</span>
+                                }
+                            </td>
+
+                            <td><span class="pill pill-gray">@item.LessonCount</span></td>
+                            <td><span class="pill pill-gray">@item.ExerciseCount</span></td>
+                            <td><span class="pill pill-green">@item.EnrollmentCount</span></td>
+                            <td><span class="pill pill-gray">@item.SubmissionCount</span></td>
+                            <td><strong>@item.AveragePercentage.ToString("0.0")</strong></td>
+
+                            <td class="course-actions">
+                                @Html.ActionLink(
+                                    "Open Course",
+                                    "Details",
+                                    "Courses",
+                                    new { id = item.CourseId },
+                                    new { @class = "btn btn-sm btn-primary" })
+
+                                @if (!string.IsNullOrWhiteSpace(item.EducatorId))
+                                {
+                                    @Html.ActionLink(
+                                        "Filter Educator",
+                                        "Index",
+                                        "AdminCourses",
+                                        new
+                                        {
+                                            educatorId = item.EducatorId,
+                                            sort = Model.Sort,
+                                            search = Model.Search
+                                        },
+                                        new { @class = "btn btn-sm btn-default" })
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        if (Model.TotalPages > 1)
+        {
+            <div class="pagination-wrap">
+                <ul class="pagination" style="margin:0;">
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        var css = i == Model.Page ? "active" : "";
+
+                        <li class="@css">
+                            @Html.ActionLink(
+                                i.ToString(),
+                                "Index",
+                                "AdminCourses",
+                                new
+                                {
+                                    page = i,
+                                    search = Model.Search,
+                                    educatorId = Model.EducatorId,
+                                    sort = Model.Sort
+                                },
+                                null)
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="empty-state">
+            No courses matched the current filter.
+        </div>
+    }
+</div>

@@ -1,0 +1,301 @@
+﻿@model FluentMY.ViewModels.CourseDetailsViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Course Details";
+    var progressWidth = "width:" + Model.ProgressPercent + "%;";
+}
+
+<style>
+    .course-detail-shell {
+        color: #1f2937;
+    }
+
+    .course-detail-hero {
+        border-radius: 24px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 32px;
+        margin-bottom: 24px;
+        box-shadow: 0 18px 36px rgba(13, 110, 253, 0.20);
+    }
+
+        .course-detail-hero h2 {
+            margin: 0 0 10px;
+            font-weight: 800;
+        }
+
+        .course-detail-hero p {
+            margin: 0 0 14px;
+            color: rgba(255,255,255,0.9);
+            max-width: 760px;
+        }
+
+    .hero-actions .btn {
+        margin-right: 10px;
+        margin-bottom: 10px;
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-weight: 600;
+    }
+
+    .course-info-card,
+    .lesson-list-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 22px;
+        margin-bottom: 20px;
+    }
+
+    .course-pill {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #0d6efd;
+        font-size: 12px;
+        font-weight: 700;
+        margin-right: 6px;
+        margin-bottom: 6px;
+    }
+
+    .progress-shell {
+        margin-top: 12px;
+    }
+
+    .progress-bar-shell {
+        width: 100%;
+        height: 12px;
+        border-radius: 999px;
+        background: #e5e7eb;
+        overflow: hidden;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+    }
+
+    .lesson-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 0;
+        border-bottom: 1px solid #eef2f7;
+    }
+
+        .lesson-row:last-child {
+            border-bottom: none;
+        }
+
+    .lesson-title {
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .lesson-meta {
+        color: #6b7280;
+        font-size: 13px;
+        margin-top: 3px;
+    }
+
+    .lesson-badges {
+        margin-top: 8px;
+    }
+
+    .status-good,
+    .status-pending,
+    .status-locked {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-right: 6px;
+        margin-bottom: 6px;
+    }
+
+    .status-good {
+        background: #ecfdf3;
+        color: #15803d;
+    }
+
+    .status-pending {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .status-locked {
+        background: #f3f4f6;
+        color: #4b5563;
+    }
+
+    .lesson-actions .btn {
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    .empty-note {
+        color: #6b7280;
+        margin-bottom: 0;
+    }
+</style>
+
+<div class="course-detail-shell">
+    <div class="course-detail-hero">
+        <h2>@Model.Title</h2>
+        <p>@(string.IsNullOrWhiteSpace(Model.Description) ? "No course description available." : Model.Description)</p>
+
+        <div>
+            <span class="course-pill">@Model.Language</span>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Level))
+            {
+                <span class="course-pill">@Model.Level</span>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.EstimatedDuration))
+            {
+                <span class="course-pill">@Model.EstimatedDuration</span>
+            }
+
+            <span class="course-pill">@Model.Lessons.Count lesson(s)</span>
+        </div>
+
+        <div class="hero-actions" style="margin-top:14px;">
+            @if (Request.IsAuthenticated && User.IsInRole("Student"))
+            {
+                if (!Model.IsEnrolled)
+                {
+                    using (Html.BeginForm("Enroll", "Courses", FormMethod.Post, new { style = "display:inline-block;" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.CourseId" />
+                        <button type="submit" class="btn btn-light">Enroll Now</button>
+                    }
+                }
+                else if (Model.ContinueLessonId.HasValue)
+                {
+                    <a class="btn btn-light" href="@Url.Action("Details", "Lessons", new { id = Model.ContinueLessonId.Value })">Continue Learning</a>
+                }
+                else if (Model.IsCompleted)
+                {
+                    <span class="btn btn-light disabled">Course Completed</span>
+                }
+            }
+            else if (!Request.IsAuthenticated)
+            {
+                <a class="btn btn-light" href="@Url.Action("Login", "Account", new { returnUrl = Url.Action("Details", "Courses", new { id = Model.CourseId }) })">Login to Start</a>
+            }
+
+            <a class="btn btn-default" href="@Url.Action("Index", "Courses")">Back to Courses</a>
+        </div>
+    </div>
+
+    @if (Request.IsAuthenticated && User.IsInRole("Student") && Model.IsEnrolled)
+    {
+        <div class="course-info-card">
+            <h3 style="font-weight:800; margin-top:0;">Your Progress</h3>
+
+            <div class="lesson-meta" style="margin-bottom:6px;">Completion: @Model.ProgressPercent%</div>
+
+            <div class="progress-shell">
+                <div class="progress-bar-shell">
+                    <div class="progress-bar-fill" style="@progressWidth"></div>
+                </div>
+            </div>
+
+            <div style="margin-top:12px;">
+                @if (Model.IsCompleted)
+                {
+                    <span class="status-good">Course Completed</span>
+                }
+                else
+                {
+                    <span class="status-pending">In Progress</span>
+                }
+            </div>
+        </div>
+    }
+
+    <div class="lesson-list-card">
+        <h3 style="font-weight:800; margin-top:0;">Lessons</h3>
+
+        @if (Model.Lessons == null || !Model.Lessons.Any())
+        {
+            <div class="alert alert-warning" style="margin-bottom:0;">No lessons are available for this course yet.</div>
+        }
+        else
+        {
+            foreach (var lesson in Model.Lessons)
+            {
+                var isContinueLesson = Model.ContinueLessonId.HasValue && Model.ContinueLessonId.Value == lesson.LessonId;
+
+                <div class="lesson-row">
+                    <div>
+                        <div class="lesson-title">@lesson.Title</div>
+
+                        <div class="lesson-meta">
+                            @(string.IsNullOrWhiteSpace(lesson.DifficultyLevel) ? "Level not set" : lesson.DifficultyLevel)
+                        </div>
+
+                        <div class="lesson-badges">
+                            @if (Request.IsAuthenticated && User.IsInRole("Student"))
+                            {
+                                if (Model.IsEnrolled)
+                                {
+                                    if (lesson.IsCompleted)
+                                    {
+                                        <span class="status-good">Completed</span>
+                                    }
+                                    else if (isContinueLesson)
+                                    {
+                                        <span class="status-pending">Next Lesson</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="status-locked">Enroll to Access</span>
+                                }
+                            }
+                            else if (!Request.IsAuthenticated)
+                            {
+                                <span class="status-locked">Login to Access</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="lesson-actions">
+                        @if (Request.IsAuthenticated && User.IsInRole("Student"))
+                        {
+                            if (Model.IsEnrolled)
+                            {
+                                <a class="btn btn-default" href="@Url.Action("Details", "Lessons", new { id = lesson.LessonId })">Open Lesson</a>
+                            }
+                            else
+                            {
+                                using (Html.BeginForm("Enroll", "Courses", FormMethod.Post, new { style = "display:inline-block;" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@Model.CourseId" />
+                                    <button type="submit" class="btn btn-primary">Enroll</button>
+                                }
+                            }
+                        }
+                        else if (!Request.IsAuthenticated)
+                        {
+                            <a class="btn btn-primary" href="@Url.Action("Login", "Account", new { returnUrl = Url.Action("Details", "Courses", new { id = Model.CourseId }) })">Login</a>
+                        }
+                        else
+                        {
+                            <span class="empty-note">Lesson access unavailable for this role.</span>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

@@ -1,0 +1,316 @@
+﻿@using System
+@using System.Collections.Generic
+@using System.Linq
+@model FluentMY.ViewModels.SpeakingResultViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Speaking Result";
+
+    var scoreParts = new List<decimal>();
+
+    if (Model.AccuracyScore.HasValue) { scoreParts.Add(Model.AccuracyScore.Value); }
+    if (Model.CompletenessScore.HasValue) { scoreParts.Add(Model.CompletenessScore.Value); }
+    if (Model.PronunciationScore.HasValue) { scoreParts.Add(Model.PronunciationScore.Value); }
+
+    var overallScore = scoreParts.Any()
+        ? (int)Math.Round(scoreParts.Average())
+        : 0;
+
+    var summary = "Keep practicing and try again for a stronger speaking result.";
+
+    if (overallScore >= 85)
+    {
+        summary = "Excellent performance. Your speaking result is very strong.";
+    }
+    else if (overallScore >= 70)
+    {
+        summary = "Good job. Your pronunciation is solid and improving well.";
+    }
+    else if (overallScore >= 50)
+    {
+        summary = "Fair attempt. Practice again and focus on clearer pronunciation.";
+    }
+}
+
+<style>
+    .speaking-result-shell {
+        color: #1f2937;
+        max-width: 980px;
+        margin: 0 auto;
+    }
+
+    .result-hero {
+        border-radius: 24px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 30px;
+        margin-bottom: 24px;
+        box-shadow: 0 18px 36px rgba(13, 110, 253, 0.20);
+    }
+
+        .result-hero h2 {
+            margin: 0 0 8px;
+            font-weight: 800;
+        }
+
+        .result-hero p {
+            margin: 0;
+            color: rgba(255,255,255,0.88);
+        }
+
+    .hero-pills {
+        margin-top: 14px;
+    }
+
+    .hero-pill {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.16);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+
+    .result-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        margin-top: 0;
+        margin-bottom: 14px;
+        font-weight: 800;
+        color: #111827;
+    }
+
+    .overall-box {
+        text-align: center;
+        padding: 22px;
+        border-radius: 18px;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        margin-bottom: 18px;
+    }
+
+    .overall-score {
+        font-size: 42px;
+        font-weight: 900;
+        color: #0d6efd;
+        line-height: 1.2;
+    }
+
+    .overall-label {
+        margin-top: 6px;
+        color: #374151;
+        font-weight: 700;
+    }
+
+    .overall-summary {
+        margin-top: 10px;
+        color: #4b5563;
+        line-height: 1.8;
+    }
+
+    .score-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 14px;
+        margin-top: 10px;
+    }
+
+    .score-box {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 16px;
+        text-align: center;
+    }
+
+    .score-value {
+        font-size: 28px;
+        font-weight: 800;
+        color: #0d6efd;
+    }
+
+    .score-label {
+        margin-top: 6px;
+        color: #6b7280;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .text-box {
+        padding: 16px;
+        border-radius: 14px;
+        margin-bottom: 14px;
+    }
+
+    .reference-box {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+    }
+
+    .recognized-box {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+    }
+
+    .attempt-meta {
+        color: #6b7280;
+        font-size: 13px;
+        margin-top: 10px;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+    }
+
+    .detail-box {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 16px;
+    }
+
+    .detail-label {
+        font-size: 12px;
+        font-weight: 800;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 8px;
+    }
+
+    .detail-value {
+        color: #111827;
+        font-weight: 600;
+        line-height: 1.8;
+        word-break: break-word;
+    }
+
+    .result-actions .btn {
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-weight: 700;
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+
+    details {
+        margin-top: 8px;
+    }
+
+        details summary {
+            cursor: pointer;
+            font-weight: 700;
+            color: #374151;
+            outline: none;
+        }
+
+    pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+        background: #111827;
+        color: #f9fafb;
+        border-radius: 14px;
+        padding: 16px;
+        max-height: 320px;
+        overflow: auto;
+        margin-top: 12px;
+    }
+</style>
+
+<div class="speaking-result-shell">
+    <div class="result-hero">
+        <h2>Speaking Result</h2>
+        <p>@Model.CourseTitle &nbsp;•&nbsp; @Model.LessonTitle</p>
+
+        <div class="hero-pills">
+            <span class="hero-pill">Attempt #@Model.AttemptNumber</span>
+            <span class="hero-pill">Overall Score: @overallScore</span>
+        </div>
+    </div>
+
+    <div class="result-card">
+        <div class="overall-box">
+            <div class="overall-score">@overallScore</div>
+            <div class="overall-label">Overall Speaking Score</div>
+            <div class="overall-summary">@summary</div>
+        </div>
+
+        <h3 class="section-title">Score Summary</h3>
+
+        <div class="score-grid">
+            <div class="score-box">
+                <div class="score-value">@((Model.AccuracyScore ?? 0).ToString("0"))</div>
+                <div class="score-label">Accuracy</div>
+            </div>
+
+            <div class="score-box">
+                <div class="score-value">-</div>
+                <div class="score-label">Fluency (N/A)</div>
+            </div>
+
+            <div class="score-box">
+                <div class="score-value">@((Model.CompletenessScore ?? 0).ToString("0"))</div>
+                <div class="score-label">Completeness</div>
+            </div>
+
+            <div class="score-box">
+                <div class="score-value">@((Model.PronunciationScore ?? 0).ToString("0"))</div>
+                <div class="score-label">Pronunciation</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="result-card">
+        <h3 class="section-title">Reference and Recognition</h3>
+
+        <div class="details-grid">
+            <div class="detail-box">
+                <div class="detail-label">Reference Text</div>
+                <div class="detail-value">@Model.ReferenceText</div>
+            </div>
+
+            <div class="detail-box">
+                <div class="detail-label">Recognized Speech</div>
+                <div class="detail-value">
+                    @(string.IsNullOrWhiteSpace(Model.RecognizedText) ? "No speech was clearly recognized." : Model.RecognizedText)
+                </div>
+            </div>
+        </div>
+
+        <div class="attempt-meta">
+            Attempt #@Model.AttemptNumber &nbsp;•&nbsp; @Model.CreatedAtUtc.ToLocalTime().ToString("dd MMM yyyy HH:mm")
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.FeedbackJson))
+    {
+        <div class="result-card">
+            <h3 class="section-title">Technical Feedback</h3>
+
+            <details>
+                <summary>Show raw feedback JSON</summary>
+                <pre>@Model.FeedbackJson</pre>
+            </details>
+        </div>
+    }
+
+    <div class="result-card">
+        <div class="result-actions">
+            <a class="btn btn-primary" href="@Url.Action("Start", "Speaking", new { exerciseId = Model.ExerciseId, lessonId = Model.LessonId })">Try Again</a>
+            <a class="btn btn-default" href="@Url.Action("History", "Speaking", new { lessonId = Model.LessonId })">View Speaking History</a>
+            <a class="btn btn-default" href="@Url.Action("Details", "Lessons", new { id = Model.LessonId })">Back to Lesson</a>
+        </div>
+    </div>
+</div>

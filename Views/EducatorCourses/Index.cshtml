@@ -1,0 +1,237 @@
+﻿@model IEnumerable<FluentMY.ViewModels.EducatorCourseViewModel>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Manage Courses";
+}
+
+<style>
+    .course-shell {
+        color: #1f2937;
+    }
+
+    .course-hero {
+        border-radius: 22px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 28px;
+        margin-bottom: 24px;
+        box-shadow: 0 16px 35px rgba(13, 110, 253, 0.20);
+    }
+
+        .course-hero h2 {
+            margin: 0 0 8px;
+            font-weight: 800;
+        }
+
+        .course-hero p {
+            margin: 0;
+            color: rgba(255,255,255,0.88);
+            max-width: 760px;
+        }
+
+    .course-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+
+        .course-toolbar .btn {
+            border-radius: 12px;
+            font-weight: 600;
+            padding: 10px 16px;
+        }
+
+    .course-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 22px;
+    }
+
+    .course-table {
+        margin-bottom: 0;
+    }
+
+        .course-table > thead > tr > th {
+            border-top: none !important;
+            color: #374151;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+
+        .course-table > tbody > tr > td {
+            vertical-align: middle;
+        }
+
+    .course-title {
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 2px;
+    }
+
+    .course-desc {
+        color: #4b5563;
+        font-size: 13px;
+        margin-top: 6px;
+        max-width: 320px;
+    }
+
+    .course-pill {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #0d6efd;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .lesson-badge {
+        display: inline-block;
+        min-width: 42px;
+        text-align: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #f3f4f6;
+        color: #374151;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .activity-text {
+        color: #6b7280;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .action-group .btn {
+        margin-right: 6px;
+        margin-bottom: 6px;
+        border-radius: 10px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 36px 20px;
+        border: 1px dashed rgba(15, 23, 42, 0.12);
+        border-radius: 16px;
+        background: #fff;
+    }
+
+        .empty-state h4 {
+            font-weight: 800;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: #6b7280;
+            margin-bottom: 16px;
+        }
+
+    @@media (max-width: 991px) {
+        .course-hero {
+            padding: 22px;
+        }
+    }
+</style>
+
+<div class="course-shell">
+    <div class="course-hero">
+        <h2>Manage Courses</h2>
+        <p>
+            Create, update, and organize the courses you own as an educator before building lessons and assessments inside them.
+        </p>
+    </div>
+
+    @if (TempData["EducatorCourseMessage"] != null)
+    {
+        <div class="alert alert-info">@TempData["EducatorCourseMessage"]</div>
+    }
+
+    <div class="course-toolbar">
+        <div>
+            <span class="activity-text">Courses are sorted by most recently updated</span>
+        </div>
+        <div>
+            <a class="btn btn-primary" href="@Url.Action("Create")">Create Course</a>
+            <a class="btn btn-default" href="@Url.Action("Index", "Educator")">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div class="course-card">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="empty-state">
+                <h4>No courses yet</h4>
+                <p>
+                    Start by creating your first course. After that, you can add lessons and exercises inside it.
+                </p>
+                <a class="btn btn-primary" href="@Url.Action("Create")">Create Course</a>
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped course-table">
+                <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>Language</th>
+                        <th>Level</th>
+                        <th>Duration</th>
+                        <th>Lessons</th>
+                        <th>Last Updated</th>
+                        <th style="width:280px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="course-title">@item.Title</div>
+                                @if (!string.IsNullOrWhiteSpace(item.Description))
+                                {
+                                    <div class="course-desc">@item.Description</div>
+                                }
+                            </td>
+                            <td>
+                                @(string.IsNullOrWhiteSpace(item.Language) ? "-" : item.Language)
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(item.Level))
+                                {
+                                    <span class="course-pill">@item.Level</span>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                            <td>
+                                @(string.IsNullOrWhiteSpace(item.EstimatedDuration) ? "-" : item.EstimatedDuration)
+                            </td>
+                            <td>
+                                <span class="lesson-badge">@item.LessonCount</span>
+                            </td>
+                            <td>
+                                <span class="activity-text">@item.LastActivityAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</span>
+                            </td>
+                            <td>
+                                <div class="action-group">
+                                    <a class="btn btn-xs btn-primary" href="@Url.Action("Edit", new { id = item.CourseId })">Edit</a>
+                                    <a class="btn btn-xs btn-success" href="@Url.Action("Index", "EducatorLessons", new { courseId = item.CourseId })">Lessons</a>
+                                    <a class="btn btn-xs btn-danger" href="@Url.Action("Delete", new { id = item.CourseId })">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

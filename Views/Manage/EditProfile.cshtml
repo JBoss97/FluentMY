@@ -1,0 +1,422 @@
+﻿@model FluentMY.Models.EditProfileViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Edit Profile";
+
+    var displayName = !string.IsNullOrWhiteSpace(Model.FullName) ? Model.FullName : Model.UserName;
+    var initial = !string.IsNullOrWhiteSpace(displayName) ? displayName.Substring(0, 1).ToUpper() : "U";
+
+    var dashboardUrl = Url.Action("Index", "Home");
+
+    if (Model.RoleName == "Admin")
+    {
+        dashboardUrl = Url.Action("Index", "Admin");
+    }
+    else if (Model.RoleName == "Educator")
+    {
+        dashboardUrl = Url.Action("Index", "Educator");
+    }
+    else if (Model.RoleName == "Student")
+    {
+        dashboardUrl = Url.Action("Index", "Student");
+    }
+}
+
+<style>
+    .profile-shell {
+        margin-top: 24px;
+        margin-bottom: 30px;
+    }
+
+    .profile-topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+        .profile-topbar h2 {
+            margin: 0;
+            font-weight: 800;
+            color: #111827;
+        }
+
+    .topbar-actions .btn {
+        margin-left: 8px;
+        margin-bottom: 8px;
+        border-radius: 12px;
+        font-weight: 700;
+        padding: 10px 16px;
+    }
+
+    .profile-card,
+    .stats-card,
+    .form-card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+        border: 1px solid rgba(15, 23, 42, 0.05);
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+
+    .profile-card {
+        text-align: center;
+    }
+
+    .profile-avatar {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #f3f4f6;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+
+    .profile-avatar-fallback {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        font-size: 48px;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 4px solid #f3f4f6;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+
+    .profile-name {
+        margin-top: 16px;
+        margin-bottom: 10px;
+        font-weight: 800;
+        color: #111827;
+    }
+
+    .profile-meta {
+        color: #4b5563;
+        margin-bottom: 8px;
+        font-size: 15px;
+    }
+
+    .section-title {
+        font-weight: 800;
+        margin-top: 0;
+        margin-bottom: 18px;
+        color: #111827;
+    }
+
+    .section-subtitle {
+        color: #6b7280;
+        margin-bottom: 18px;
+    }
+
+    .stat-box {
+        background: #f8fafc;
+        border-radius: 14px;
+        padding: 14px;
+        text-align: center;
+        margin-bottom: 12px;
+        border: 1px solid #eef2f7;
+    }
+
+        .stat-box h4 {
+            margin: 0;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .stat-box p {
+            margin: 4px 0 0;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+    .progress {
+        margin-bottom: 0;
+        border-radius: 999px;
+        overflow: hidden;
+        height: 22px;
+        background: #e5e7eb;
+    }
+
+    .progress-bar {
+        font-weight: 700;
+        line-height: 22px;
+    }
+
+    .btn-space {
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+
+    .role-badge {
+        margin-bottom: 14px;
+        display: inline-block;
+    }
+
+    .email-badge {
+        margin-top: 10px;
+        display: inline-block;
+    }
+
+    .form-card .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-card .control-label {
+        font-weight: 700;
+        color: #374151;
+    }
+
+    .form-card .form-control {
+        border-radius: 12px;
+        min-height: 44px;
+        box-shadow: none;
+    }
+
+    .form-card textarea.form-control {
+        min-height: 130px;
+        resize: vertical;
+    }
+
+    .form-actions {
+        margin-top: 10px;
+    }
+
+        .form-actions .btn {
+            border-radius: 12px;
+            font-weight: 700;
+            padding: 10px 16px;
+        }
+
+    .alert {
+        border-radius: 14px;
+    }
+
+    .profile-divider {
+        margin: 20px 0;
+    }
+
+    .info-note {
+        color: #6b7280;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+</style>
+
+<div class="container profile-shell">
+    <div class="profile-topbar">
+        <div>
+            <h2>Edit Profile</h2>
+            <div class="section-subtitle">Update your account details, learning preferences, and profile picture.</div>
+        </div>
+
+        <div class="topbar-actions">
+            <a href="@dashboardUrl" class="btn btn-default">
+                &larr; Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["ProfileMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["ProfileMessage"]
+        </div>
+    }
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+    }
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="profile-card">
+                @if (!string.IsNullOrEmpty(Model.ExistingProfileImagePath))
+                {
+                    <img src="@Url.Content(Model.ExistingProfileImagePath)" alt="Profile Picture" class="profile-avatar" />
+                }
+                else
+                {
+                    <div class="profile-avatar-fallback">@initial</div>
+                }
+
+                <h3 class="profile-name">@displayName</h3>
+
+                <div>
+                    @if (Model.RoleName == "Admin")
+                    {
+                        <span class="label label-danger role-badge">Admin</span>
+                    }
+                    else if (Model.RoleName == "Educator")
+                    {
+                        <span class="label label-primary role-badge">Educator</span>
+                    }
+                    else if (Model.RoleName == "Student")
+                    {
+                        <span class="label label-success role-badge">Student</span>
+                    }
+                    else
+                    {
+                        <span class="label label-default role-badge">@Model.RoleName</span>
+                    }
+                </div>
+
+                <div class="profile-meta"><strong>Username:</strong> @Model.UserName</div>
+                <div class="profile-meta"><strong>Email:</strong> @Model.Email</div>
+                <div class="profile-meta">
+                    <strong>Joined:</strong>
+                    @(Model.JoinedAt.HasValue ? Model.JoinedAt.Value.ToString("dd MMM yyyy") : "Not available")
+                </div>
+                <div class="profile-meta">
+                    <strong>Language Level:</strong>
+                    @(string.IsNullOrWhiteSpace(Model.LanguageLevel) ? "Not set" : Model.LanguageLevel)
+                </div>
+
+                @if (Model.IsEmailConfirmed)
+                {
+                    <span class="label label-success email-badge">Email Confirmed</span>
+                }
+                else
+                {
+                    <span class="label label-warning email-badge">Email Not Confirmed</span>
+                }
+
+                <hr class="profile-divider" />
+
+                @Html.ActionLink("Change Password", "ChangePassword", "Manage", null, new { @class = "btn btn-warning btn-space" })
+
+                @if (!string.IsNullOrEmpty(Model.ExistingProfileImagePath))
+                {
+                    using (Html.BeginForm("RemoveProfileImage", "Manage", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger btn-space">Remove Picture</button>
+                    }
+                }
+            </div>
+
+            @if (Model.RoleName == "Student")
+            {
+                <div class="stats-card">
+                    <h4 class="section-title">Learning Statistics</h4>
+
+                    <div class="stat-box">
+                        <h4>@Model.EnrolledCoursesCount</h4>
+                        <p>Enrolled Courses</p>
+                    </div>
+
+                    <div class="stat-box">
+                        <h4>@Model.CompletedCoursesCount</h4>
+                        <p>Completed Courses</p>
+                    </div>
+
+                    <div class="stat-box">
+                        <h4>@Model.OverallProgressPercent%</h4>
+                        <p>Overall Progress</p>
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-success" style="@("width:" + Model.OverallProgressPercent + "%;")">
+                            @Model.OverallProgressPercent%
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="col-md-8">
+            <div class="form-card">
+                <h3 class="section-title">Profile Details</h3>
+                <div class="section-subtitle">Make changes below and save when you are ready.</div>
+
+                @using (Html.BeginForm("EditProfile", "Manage", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.UserName, new { @class = "col-md-3 control-label" })
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Enter username" })
+                            @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Email, new { @class = "col-md-3 control-label" })
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Enter email" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                            <div class="info-note">If you change your email, you will need to confirm the new address.</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.FullName, new { @class = "col-md-3 control-label" })
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", placeholder = "Enter full name" })
+                            @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.LanguageLevel, new { @class = "col-md-3 control-label" })
+                        <div class="col-md-9">
+                            @Html.DropDownListFor(
+                                m => m.LanguageLevel,
+                                new SelectList(
+                                    new[]
+                                    {
+                                        new { Value = "", Text = "-- Select Level --" },
+                                        new { Value = "A1", Text = "A1 - Beginner" },
+                                        new { Value = "A2", Text = "A2 - Elementary" },
+                                        new { Value = "B1", Text = "B1 - Intermediate" },
+                                        new { Value = "B2", Text = "B2 - Upper Intermediate" },
+                                        new { Value = "C1", Text = "C1 - Advanced" },
+                                        new { Value = "C2", Text = "C2 - Proficient" }
+                                    },
+                                    "Value",
+                                    "Text",
+                                    Model.LanguageLevel
+                                ),
+                                new { @class = "form-control" }
+                            )
+                            @Html.ValidationMessageFor(m => m.LanguageLevel, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Bio, new { @class = "col-md-3 control-label" })
+                        <div class="col-md-9">
+                            @Html.TextAreaFor(m => m.Bio, new { @class = "form-control", rows = 5, placeholder = "Write a short bio..." })
+                            @Html.ValidationMessageFor(m => m.Bio, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.ProfileImageFile, new { @class = "col-md-3 control-label" })
+                        <div class="col-md-9">
+                            <input type="file" name="ProfileImageFile" class="form-control" accept=".jpg,.jpeg,.png,.gif" />
+                            @Html.ValidationMessageFor(m => m.ProfileImageFile, "", new { @class = "text-danger" })
+                            <div class="info-note">Allowed: JPG, JPEG, PNG, GIF. Max size: 2MB.</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group form-actions">
+                        <div class="col-md-offset-3 col-md-9">
+                            <button type="submit" class="btn btn-primary btn-space">Save Changes</button>
+                            <a href="@Url.Action("EditProfile", "Manage")" class="btn btn-default btn-space">Refresh Page</a>
+                            <a href="@dashboardUrl" class="btn btn-link btn-space">&larr; Dashboard</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

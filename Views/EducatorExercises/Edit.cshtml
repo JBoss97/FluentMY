@@ -1,0 +1,460 @@
+﻿@model FluentMY.ViewModels.EducatorExerciseEditViewModel
+@using System
+@using System.Linq
+@using System.Collections.Generic
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Edit Exercise";
+
+    var selectedMultiAnswers = new HashSet<string>(
+        ((Model.CorrectAnswer ?? "")
+            .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(x => x.Trim().ToUpperInvariant())),
+        StringComparer.OrdinalIgnoreCase);
+}
+
+<style>
+    .exercise-form-shell {
+        color: #1f2937;
+    }
+
+    .exercise-form-hero {
+        border-radius: 22px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 28px;
+        margin-bottom: 24px;
+        box-shadow: 0 16px 35px rgba(13, 110, 253, 0.20);
+    }
+
+        .exercise-form-hero h2 {
+            margin: 0 0 8px;
+            font-weight: 800;
+        }
+
+        .exercise-form-hero p {
+            margin: 0;
+            color: rgba(255,255,255,0.88);
+        }
+
+    .exercise-form-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 24px;
+    }
+
+        .exercise-form-card .form-group {
+            margin-bottom: 18px;
+        }
+
+        .exercise-form-card label {
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .exercise-form-card .form-control {
+            border-radius: 12px;
+            min-height: 44px;
+        }
+
+    .exercise-form-actions .btn {
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-weight: 600;
+        margin-right: 8px;
+    }
+
+    .form-help {
+        color: #6b7280;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .type-section {
+        display: none;
+        padding: 18px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        margin-bottom: 18px;
+    }
+
+        .type-section.active {
+            display: block;
+        }
+
+    .section-heading {
+        font-weight: 800;
+        margin-top: 0;
+        margin-bottom: 14px;
+        color: #111827;
+        font-size: 16px;
+    }
+
+    .audio-note {
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 13px;
+        font-weight: 600;
+        margin-top: 8px;
+    }
+
+    .current-audio-box {
+        padding: 14px;
+        border-radius: 14px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+    }
+
+        .current-audio-box audio {
+            width: 100%;
+            margin-top: 8px;
+        }
+
+    .checkbox-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .checkbox-card {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 14px;
+        border: 1px solid #dbe3ef;
+        border-radius: 12px;
+        background: #fff;
+    }
+
+        .checkbox-card input[type="checkbox"] {
+            margin-top: 0;
+        }
+
+    .choice-answer-box {
+        margin-top: 12px;
+    }
+</style>
+
+<div class="exercise-form-shell">
+    <div class="exercise-form-hero">
+        <h2>Edit Exercise</h2>
+        <p>
+            <strong>Course:</strong> @ViewBag.CourseTitle &nbsp;•&nbsp;
+            <strong>Lesson:</strong> @ViewBag.LessonTitle
+        </p>
+    </div>
+
+    <div class="exercise-form-card">
+        @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+
+        @using (Html.BeginForm("Edit", "EducatorExercises", FormMethod.Post, new { enctype = "multipart/form-data", id = "exerciseForm" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.ExerciseId)
+            @Html.HiddenFor(m => m.LessonId)
+            @Html.HiddenFor(m => m.CorrectAnswer, new { id = "CorrectAnswerHidden" })
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.PracticeArea)
+                @Html.DropDownListFor(m => m.PracticeArea, (SelectList)ViewBag.PracticeAreas, "-- Select Practice Area --", new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.PracticeArea, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.ExerciseType)
+                @Html.DropDownListFor(m => m.ExerciseType, (SelectList)ViewBag.ExerciseTypes, "-- Select Exercise Type --", new { @class = "form-control", id = "ExerciseType" })
+                @Html.ValidationMessageFor(m => m.ExerciseType, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.PromptText)
+                @Html.TextAreaFor(m => m.PromptText, new { @class = "form-control", rows = 4, placeholder = "Enter the prompt or question text" })
+                @Html.ValidationMessageFor(m => m.PromptText, "", new { @class = "text-danger" })
+            </div>
+
+            <div id="choiceSection" class="type-section">
+                <h4 class="section-heading">Choice Options</h4>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.OptionA)
+                    @Html.TextBoxFor(m => m.OptionA, new { @class = "form-control", placeholder = "Option A" })
+                    @Html.ValidationMessageFor(m => m.OptionA, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.OptionB)
+                    @Html.TextBoxFor(m => m.OptionB, new { @class = "form-control", placeholder = "Option B" })
+                    @Html.ValidationMessageFor(m => m.OptionB, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.OptionC)
+                    @Html.TextBoxFor(m => m.OptionC, new { @class = "form-control", placeholder = "Option C" })
+                    @Html.ValidationMessageFor(m => m.OptionC, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.OptionD)
+                    @Html.TextBoxFor(m => m.OptionD, new { @class = "form-control", placeholder = "Option D" })
+                    @Html.ValidationMessageFor(m => m.OptionD, "", new { @class = "text-danger" })
+                </div>
+
+                <div id="singleChoiceAnswerSection" class="choice-answer-box">
+                    <div class="form-group">
+                        <label for="CorrectAnswerChoice">Correct Answer</label>
+                        <select id="CorrectAnswerChoice" class="form-control">
+                            <option value="">-- Select Correct Answer --</option>
+                            <option value="A" @(Model.CorrectAnswer == "A" ? "selected=\"selected\"" : "")>A</option>
+                            <option value="B" @(Model.CorrectAnswer == "B" ? "selected=\"selected\"" : "")>B</option>
+                            <option value="C" @(Model.CorrectAnswer == "C" ? "selected=\"selected\"" : "")>C</option>
+                            <option value="D" @(Model.CorrectAnswer == "D" ? "selected=\"selected\"" : "")>D</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="multiChoiceAnswerSection" class="choice-answer-box" style="display:none;">
+                    <label>Correct Answers</label>
+                    <div class="checkbox-grid">
+                        <label class="checkbox-card">
+                            <input type="checkbox" class="correct-answer-check" value="A" @(selectedMultiAnswers.Contains("A") ? "checked=\"checked\"" : "") />
+                            <span>A</span>
+                        </label>
+                        <label class="checkbox-card">
+                            <input type="checkbox" class="correct-answer-check" value="B" @(selectedMultiAnswers.Contains("B") ? "checked=\"checked\"" : "") />
+                            <span>B</span>
+                        </label>
+                        <label class="checkbox-card">
+                            <input type="checkbox" class="correct-answer-check" value="C" @(selectedMultiAnswers.Contains("C") ? "checked=\"checked\"" : "") />
+                            <span>C</span>
+                        </label>
+                        <label class="checkbox-card">
+                            <input type="checkbox" class="correct-answer-check" value="D" @(selectedMultiAnswers.Contains("D") ? "checked=\"checked\"" : "") />
+                            <span>D</span>
+                        </label>
+                    </div>
+                    <div class="form-help">
+                        Multiple Select uses comma-separated values like A,C or B,D.
+                    </div>
+                </div>
+
+                @Html.ValidationMessageFor(m => m.CorrectAnswer, "", new { @class = "text-danger" })
+            </div>
+
+            <div id="fillBlankSection" class="type-section">
+                <h4 class="section-heading">Fill in the Blank Answer</h4>
+
+                <div class="form-group">
+                    <label for="CorrectAnswerText">Expected Answer</label>
+                    <input type="text" id="CorrectAnswerText" class="form-control" value="@Model.CorrectAnswer" placeholder="Enter the expected answer" />
+                    @Html.ValidationMessageFor(m => m.CorrectAnswer, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div id="matchingSection" class="type-section">
+                <h4 class="section-heading">Matching Pairs</h4>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.MatchingPairsJson)
+                    @Html.TextAreaFor(m => m.MatchingPairsJson, new { @class = "form-control", rows = 5, placeholder = "{\"ba\":\"ba\",\"ju\":\"ju\"}" })
+                    @Html.ValidationMessageFor(m => m.MatchingPairsJson, "", new { @class = "text-danger" })
+                    <div class="form-help">Example format: {"ba":"basikal","bu":"buku"}</div>
+                </div>
+            </div>
+
+            <div id="reorderSection" class="type-section">
+                <h4 class="section-heading">Sentence Reorder Tokens</h4>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.SentenceTokensJson)
+                    @Html.TextAreaFor(m => m.SentenceTokensJson, new { @class = "form-control", rows = 5, placeholder = "[\"Ali\",\"membaca\",\"buku\"]" })
+                    @Html.ValidationMessageFor(m => m.SentenceTokensJson, "", new { @class = "text-danger" })
+                    <div class="form-help">Example format: ["Ali","membaca","buku"]</div>
+                </div>
+            </div>
+
+            <div id="speakingSection" class="type-section">
+                <h4 class="section-heading">Speaking Practice Settings</h4>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ReferenceText)
+                    @Html.TextAreaFor(m => m.ReferenceText, new { @class = "form-control", rows = 3, placeholder = "Text the student should pronounce" })
+                    @Html.ValidationMessageFor(m => m.ReferenceText, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.SyllableGuide)
+                    @Html.TextBoxFor(m => m.SyllableGuide, new { @class = "form-control", placeholder = "ba-si-kal" })
+                    @Html.ValidationMessageFor(m => m.SyllableGuide, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.PronunciationHint)
+                    @Html.TextBoxFor(m => m.PronunciationHint, new { @class = "form-control", placeholder = "Say each syllable clearly" })
+                    @Html.ValidationMessageFor(m => m.PronunciationHint, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.AudioPromptFile, "Replace Audio File")
+                <input type="file" name="AudioPromptFile" class="form-control" accept=".mp3,.wav,.ogg,.m4a" />
+                @Html.ValidationMessageFor(m => m.AudioPromptFile, "", new { @class = "text-danger" })
+                <div class="form-help">Leave blank to keep the current audio file. Supported formats: MP3, WAV, OGG, M4A. Max size: 10MB.</div>
+                <div class="audio-note">
+                    Use audio for Listening + Choice, or optionally for Speaking to provide pronunciation guidance.
+                </div>
+            </div>
+
+            if (!string.IsNullOrWhiteSpace(Model.ExistingAudioPromptPath))
+            {
+                <div class="form-group">
+                    <label>Current Audio</label>
+                    <div class="current-audio-box">
+                        <div class="form-help" style="margin-top:0;">The current uploaded audio will remain unless you replace it.</div>
+                        <audio controls src="@Url.Content(Model.ExistingAudioPromptPath)"></audio>
+                    </div>
+                </div>
+            }
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Marks)
+                @Html.TextBoxFor(m => m.Marks, new { @class = "form-control", type = "number", min = "1" })
+                @Html.ValidationMessageFor(m => m.Marks, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.DisplayOrder)
+                @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", type = "number", min = "0" })
+                @Html.ValidationMessageFor(m => m.DisplayOrder, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.XPReward)
+                @Html.TextBoxFor(m => m.XPReward, new { @class = "form-control", type = "number", min = "0" })
+                @Html.ValidationMessageFor(m => m.XPReward, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="checkbox">
+                <label>
+                    @Html.CheckBoxFor(m => m.AllowRetry) Allow Retry
+                </label>
+            </div>
+
+            <div class="exercise-form-actions">
+                <button type="submit" class="btn btn-primary">Update Exercise</button>
+                <a class="btn btn-default" href="@Url.Action("Index", new { lessonId = Model.LessonId })">Cancel</a>
+            </div>
+        }
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        (function () {
+            var typeDropdown = document.getElementById("ExerciseType");
+            var correctAnswerHidden = document.getElementById("CorrectAnswerHidden");
+            var correctAnswerChoice = document.getElementById("CorrectAnswerChoice");
+            var correctAnswerText = document.getElementById("CorrectAnswerText");
+            var multiAnswerChecks = document.querySelectorAll(".correct-answer-check");
+            var form = document.getElementById("exerciseForm");
+
+            var choiceSection = document.getElementById("choiceSection");
+            var fillBlankSection = document.getElementById("fillBlankSection");
+            var matchingSection = document.getElementById("matchingSection");
+            var reorderSection = document.getElementById("reorderSection");
+            var speakingSection = document.getElementById("speakingSection");
+
+            var singleChoiceAnswerSection = document.getElementById("singleChoiceAnswerSection");
+            var multiChoiceAnswerSection = document.getElementById("multiChoiceAnswerSection");
+
+            function hideAll() {
+                choiceSection.classList.remove("active");
+                fillBlankSection.classList.remove("active");
+                matchingSection.classList.remove("active");
+                reorderSection.classList.remove("active");
+                speakingSection.classList.remove("active");
+            }
+
+            function getCheckedMultiAnswers() {
+                var values = [];
+                for (var i = 0; i < multiAnswerChecks.length; i++) {
+                    if (multiAnswerChecks[i].checked) {
+                        values.push(multiAnswerChecks[i].value);
+                    }
+                }
+
+                values.sort();
+                return values.join(",");
+            }
+
+            function syncCorrectAnswer() {
+                var value = typeDropdown ? typeDropdown.value : "";
+
+                if (value === "MultipleChoice" || value === "ListeningChoice") {
+                    correctAnswerHidden.value = correctAnswerChoice ? correctAnswerChoice.value : "";
+                } else if (value === "MultipleSelect") {
+                    correctAnswerHidden.value = getCheckedMultiAnswers();
+                } else if (value === "FillBlank") {
+                    correctAnswerHidden.value = correctAnswerText ? correctAnswerText.value : "";
+                } else {
+                    correctAnswerHidden.value = "";
+                }
+            }
+
+            function toggleSections() {
+                hideAll();
+
+                var value = typeDropdown ? typeDropdown.value : "";
+
+                if (value === "MultipleChoice" || value === "ListeningChoice" || value === "MultipleSelect") {
+                    choiceSection.classList.add("active");
+
+                    if (value === "MultipleSelect") {
+                        singleChoiceAnswerSection.style.display = "none";
+                        multiChoiceAnswerSection.style.display = "block";
+                    } else {
+                        singleChoiceAnswerSection.style.display = "block";
+                        multiChoiceAnswerSection.style.display = "none";
+                    }
+                } else if (value === "FillBlank") {
+                    fillBlankSection.classList.add("active");
+                } else if (value === "Matching") {
+                    matchingSection.classList.add("active");
+                } else if (value === "Reorder") {
+                    reorderSection.classList.add("active");
+                } else if (value === "Speaking") {
+                    speakingSection.classList.add("active");
+                }
+
+                syncCorrectAnswer();
+            }
+
+            if (typeDropdown) {
+                typeDropdown.addEventListener("change", toggleSections);
+            }
+
+            if (correctAnswerChoice) {
+                correctAnswerChoice.addEventListener("change", syncCorrectAnswer);
+            }
+
+            if (correctAnswerText) {
+                correctAnswerText.addEventListener("input", syncCorrectAnswer);
+            }
+
+            for (var i = 0; i < multiAnswerChecks.length; i++) {
+                multiAnswerChecks[i].addEventListener("change", syncCorrectAnswer);
+            }
+
+            if (form) {
+                form.addEventListener("submit", syncCorrectAnswer);
+            }
+
+            toggleSections();
+        })();
+    </script>
+}

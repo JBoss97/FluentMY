@@ -1,0 +1,530 @@
+﻿@model FluentMY.ViewModels.LessonSubmissionViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Start Quiz";
+}
+
+<style>
+    .quiz-shell {
+        color: #1f2937;
+    }
+
+    .quiz-hero {
+        border-radius: 22px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 28px;
+        margin-bottom: 24px;
+        box-shadow: 0 16px 35px rgba(13, 110, 253, 0.20);
+    }
+
+        .quiz-hero h2 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-weight: 800;
+        }
+
+        .quiz-hero p {
+            margin: 0;
+            color: rgba(255,255,255,0.88);
+        }
+
+    .quiz-info-card,
+    .quiz-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15, 23, 42, 0.06);
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .quiz-info-card {
+        padding: 20px;
+    }
+
+    .quiz-card .panel-body {
+        padding: 20px;
+    }
+
+    .quiz-question-no {
+        display: inline-block;
+        background: #eff6ff;
+        color: #0d6efd;
+        font-weight: 700;
+        font-size: 12px;
+        border-radius: 999px;
+        padding: 5px 10px;
+        margin-bottom: 12px;
+    }
+
+    .quiz-type-pill {
+        display: inline-block;
+        background: #f3f4f6;
+        color: #374151;
+        font-weight: 700;
+        font-size: 12px;
+        border-radius: 999px;
+        padding: 5px 10px;
+        margin-left: 8px;
+        margin-bottom: 12px;
+    }
+
+    .quiz-question-text {
+        font-size: 17px;
+        font-weight: 700;
+        margin-bottom: 14px;
+        color: #1f2937;
+    }
+
+    .quiz-option {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-bottom: 10px;
+        transition: all 0.2s ease;
+        background: #fff;
+    }
+
+        .quiz-option:hover {
+            border-color: #0d6efd;
+            background: #f8fbff;
+        }
+
+        .quiz-option label {
+            display: block;
+            margin: 0;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+    .quiz-text-input {
+        border-radius: 12px;
+        min-height: 46px;
+    }
+
+    .quiz-actions .btn {
+        margin-right: 8px;
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-weight: 600;
+    }
+
+    .quiz-note {
+        color: #6b7280;
+        font-size: 13px;
+        margin-top: 8px;
+    }
+
+    .audio-box {
+        margin-bottom: 16px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+    }
+
+    .matching-row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+    }
+
+    .matching-left {
+        min-width: 160px;
+        font-weight: 700;
+        color: #111827;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        padding: 10px 12px;
+        border-radius: 12px;
+    }
+
+    .matching-select {
+        max-width: 280px;
+        border-radius: 12px;
+    }
+
+    .reorder-box {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 14px;
+    }
+
+    .reorder-token {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+        border: 1px solid #dbe3ef;
+        border-radius: 12px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+    }
+
+    .reorder-token-text {
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .reorder-actions button {
+        margin-left: 6px;
+        border-radius: 10px;
+    }
+
+    .unsupported-box {
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        color: #9a3412;
+        border-radius: 12px;
+        padding: 12px 14px;
+    }
+</style>
+
+<div class="quiz-shell">
+    <div class="quiz-hero">
+        <h2>@Model.LessonTitle - Quiz</h2>
+        <p>@Model.CourseTitle</p>
+    </div>
+
+    @if (Model.Questions == null || !Model.Questions.Any())
+    {
+        <div class="alert alert-warning">
+            No quiz questions are available for this lesson yet.
+        </div>
+
+        <a class="btn btn-default" href="@Url.Action("Details", "Lessons", new { id = Model.LessonId })">
+            Back to Lesson
+        </a>
+    }
+    else
+    {
+        <div class="quiz-info-card">
+            <strong>Total Questions:</strong> @Model.Questions.Count
+            <div class="quiz-note">Answer all questions carefully before submitting.</div>
+        </div>
+
+        using (Html.BeginForm("Submit", "StudentSubmissions", FormMethod.Post, new { id = "quizForm" }))
+        {
+            @Html.AntiForgeryToken()
+
+            @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+
+            @Html.HiddenFor(m => m.LessonId)
+            @Html.HiddenFor(m => m.LessonTitle)
+            @Html.HiddenFor(m => m.CourseTitle)
+
+            for (int i = 0; i < Model.Questions.Count; i++)
+            {
+                var type = (Model.Questions[i].ExerciseType ?? "MultipleChoice").Trim();
+
+                <div class="panel panel-default quiz-card">
+                    <div class="panel-body">
+                        <div>
+                            <span class="quiz-question-no">Question @(i + 1)</span>
+                            <span class="quiz-type-pill">@type</span>
+                        </div>
+
+                        <div class="quiz-question-text">
+                            @(string.IsNullOrWhiteSpace(Model.Questions[i].PromptText)
+                                ? Model.Questions[i].QuestionText
+                                : Model.Questions[i].PromptText)
+                        </div>
+
+                        @Html.HiddenFor(m => m.Questions[i].ExerciseId)
+                        @Html.HiddenFor(m => m.Questions[i].ExerciseType)
+                        @Html.HiddenFor(m => m.Questions[i].PracticeArea)
+                        @Html.HiddenFor(m => m.Questions[i].QuestionText)
+                        @Html.HiddenFor(m => m.Questions[i].PromptText)
+                        @Html.HiddenFor(m => m.Questions[i].OptionA)
+                        @Html.HiddenFor(m => m.Questions[i].OptionB)
+                        @Html.HiddenFor(m => m.Questions[i].OptionC)
+                        @Html.HiddenFor(m => m.Questions[i].OptionD)
+                        @Html.HiddenFor(m => m.Questions[i].MatchingPairsJson, new { @class = "matching-json-source" })
+                        @Html.HiddenFor(m => m.Questions[i].SentenceTokensJson, new { @class = "reorder-json-source" })
+                        @Html.HiddenFor(m => m.Questions[i].AudioPromptPath)
+                        @Html.HiddenFor(m => m.Questions[i].ReferenceText)
+                        @Html.HiddenFor(m => m.Questions[i].SyllableGuide)
+                        @Html.HiddenFor(m => m.Questions[i].PronunciationHint)
+                        @Html.HiddenFor(m => m.Questions[i].SelectedAnswerJson, new { @class = "selected-answer-json" })
+
+                        if (type == "MultipleChoice" || type == "ListeningChoice")
+                        {
+                        if (!string.IsNullOrWhiteSpace(Model.Questions[i].AudioPromptPath))
+                        {
+                        <div class="audio-box">
+                            <strong>Listen:</strong><br />
+                            <audio controls src="@Url.Content(Model.Questions[i].AudioPromptPath)"></audio>
+                        </div>
+                        }
+
+                        <div class="quiz-option">
+                            <label>
+                                @Html.RadioButtonFor(m => m.Questions[i].SelectedAnswer, "A")
+                                <strong>A.</strong> @Model.Questions[i].OptionA
+                            </label>
+                        </div>
+
+                        <div class="quiz-option">
+                            <label>
+                                @Html.RadioButtonFor(m => m.Questions[i].SelectedAnswer, "B")
+                                <strong>B.</strong> @Model.Questions[i].OptionB
+                            </label>
+                        </div>
+
+                        <div class="quiz-option">
+                            <label>
+                                @Html.RadioButtonFor(m => m.Questions[i].SelectedAnswer, "C")
+                                <strong>C.</strong> @Model.Questions[i].OptionC
+                            </label>
+                        </div>
+
+                        <div class="quiz-option">
+                            <label>
+                                @Html.RadioButtonFor(m => m.Questions[i].SelectedAnswer, "D")
+                                <strong>D.</strong> @Model.Questions[i].OptionD
+                            </label>
+                        </div>
+                        }
+                        else if (type == "MultipleSelect")
+                        {
+                        <div class="quiz-note" style="margin-bottom:12px;">
+                            Choose all correct answers.
+                        </div>
+
+                        <div class="quiz-option">
+                            <label>
+                                <input type="checkbox" name="Questions[@i].SelectedAnswers" value="A"
+                                       @(Model.Questions[i].SelectedAnswers != null && Model.Questions[i].SelectedAnswers.Contains("A") ? "checked=\"checked\"" : "") />
+                                <strong>A.</strong> @Model.Questions[i].OptionA
+                            </label>
+                        </div>
+
+                        <div class="quiz-option">
+                            <label>
+                                <input type="checkbox" name="Questions[@i].SelectedAnswers" value="B"
+                                       @(Model.Questions[i].SelectedAnswers != null && Model.Questions[i].SelectedAnswers.Contains("B") ? "checked=\"checked\"" : "") />
+                                <strong>B.</strong> @Model.Questions[i].OptionB
+                            </label>
+                        </div>
+
+                        <div class="quiz-option">
+                            <label>
+                                <input type="checkbox" name="Questions[@i].SelectedAnswers" value="C"
+                                       @(Model.Questions[i].SelectedAnswers != null && Model.Questions[i].SelectedAnswers.Contains("C") ? "checked=\"checked\"" : "") />
+                                <strong>C.</strong> @Model.Questions[i].OptionC
+                            </label>
+                        </div>
+
+                        <div class="quiz-option">
+                            <label>
+                                <input type="checkbox" name="Questions[@i].SelectedAnswers" value="D"
+                                       @(Model.Questions[i].SelectedAnswers != null && Model.Questions[i].SelectedAnswers.Contains("D") ? "checked=\"checked\"" : "") />
+                                <strong>D.</strong> @Model.Questions[i].OptionD
+                            </label>
+                        </div>
+                        }
+                        else if (type == "FillBlank")
+                        {
+                        @Html.TextBoxFor(m => m.Questions[i].SelectedAnswer, new
+                        {
+                            @class = "form-control quiz-text-input",
+                            placeholder = "Type your answer here"
+                        })
+                        }
+                        else if (type == "Matching")
+                        {
+                        <div class="matching-container" data-index="@i"></div>
+                        }
+                        else if (type == "Reorder")
+                        {
+                        <div class="reorder-box">
+                            <div class="reorder-container" data-index="@i"></div>
+                        </div>
+                        }
+                        else
+                        {
+                        <div class="unsupported-box">
+                            This exercise type is not supported in the standard quiz form yet.
+                        </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="quiz-actions">
+                <button type="submit" class="btn btn-primary">Submit Quiz</button>
+                <a class="btn btn-default" href="@Url.Action("Details", "Lessons", new { id = Model.LessonId })">
+                    Back to Lesson
+                </a>
+            </div>
+
+            <div class="quiz-note">
+                Your submission will be scored automatically and your lesson progress will be updated.
+            </div>
+        }
+    }
+</div>
+
+@section scripts{
+    <script>
+        (function () {
+            function shuffle(array) {
+                var arr = array.slice();
+                for (var i = arr.length - 1; i > 0; i--) {
+                    var j = Math.floor(Math.random() * (i + 1));
+                    var temp = arr[i];
+                    arr[i] = arr[j];
+                    arr[j] = temp;
+                }
+                return arr;
+            }
+
+            function renderMatching(container, jsonInput, hiddenAnswerInput) {
+                if (!container || !jsonInput || !hiddenAnswerInput) return;
+
+                var raw = jsonInput.value || "{}";
+                var pairs;
+
+                try {
+                    pairs = JSON.parse(raw);
+                } catch (e) {
+                    container.innerHTML = '<div class="unsupported-box">Matching data is invalid.</div>';
+                    return;
+                }
+
+                var keys = Object.keys(pairs);
+                var values = keys.map(function (k) { return pairs[k]; });
+                var shuffledValues = shuffle(values);
+
+                function updateHidden() {
+                    var result = {};
+                    var selects = container.querySelectorAll("select[data-left]");
+                    for (var i = 0; i < selects.length; i++) {
+                        var left = selects[i].getAttribute("data-left");
+                        result[left] = selects[i].value || "";
+                    }
+                    hiddenAnswerInput.value = JSON.stringify(result);
+                }
+
+                var html = "";
+                for (var i = 0; i < keys.length; i++) {
+                    html += '<div class="matching-row">';
+                    html += '<div class="matching-left">' + keys[i] + '</div>';
+                    html += '<select class="form-control matching-select" data-left="' + keys[i] + '">';
+                    html += '<option value="">-- Select match --</option>';
+
+                    for (var j = 0; j < shuffledValues.length; j++) {
+                        html += '<option value="' + shuffledValues[j] + '">' + shuffledValues[j] + '</option>';
+                    }
+
+                    html += '</select>';
+                    html += '</div>';
+                }
+
+                container.innerHTML = html;
+
+                var dropdowns = container.querySelectorAll("select[data-left]");
+                for (var d = 0; d < dropdowns.length; d++) {
+                    dropdowns[d].addEventListener("change", updateHidden);
+                }
+
+                updateHidden();
+            }
+
+            function renderReorder(container, jsonInput, hiddenAnswerInput) {
+                if (!container || !jsonInput || !hiddenAnswerInput) return;
+
+                var raw = jsonInput.value || "[]";
+                var tokens;
+
+                try {
+                    tokens = JSON.parse(raw);
+                } catch (e) {
+                    container.innerHTML = '<div class="unsupported-box">Sentence reorder data is invalid.</div>';
+                    return;
+                }
+
+                if (!tokens || !tokens.length) {
+                    container.innerHTML = '<div class="unsupported-box">No sentence tokens found.</div>';
+                    return;
+                }
+
+                var currentTokens = shuffle(tokens);
+
+                function updateHidden() {
+                    hiddenAnswerInput.value = JSON.stringify(currentTokens);
+                }
+
+                function render() {
+                    var html = "";
+
+                    for (var i = 0; i < currentTokens.length; i++) {
+                        html += '<div class="reorder-token">';
+                        html += '<div class="reorder-token-text">' + currentTokens[i] + '</div>';
+                        html += '<div class="reorder-actions">';
+                        html += '<button type="button" class="btn btn-default btn-xs move-up" data-index="' + i + '">↑</button>';
+                        html += '<button type="button" class="btn btn-default btn-xs move-down" data-index="' + i + '">↓</button>';
+                        html += '</div>';
+                        html += '</div>';
+                    }
+
+                    container.innerHTML = html;
+
+                    var upButtons = container.querySelectorAll(".move-up");
+                    var downButtons = container.querySelectorAll(".move-down");
+
+                    for (var u = 0; u < upButtons.length; u++) {
+                        upButtons[u].addEventListener("click", function () {
+                            var index = parseInt(this.getAttribute("data-index"));
+                            if (index > 0) {
+                                var temp = currentTokens[index - 1];
+                                currentTokens[index - 1] = currentTokens[index];
+                                currentTokens[index] = temp;
+                                render();
+                                updateHidden();
+                            }
+                        });
+                    }
+
+                    for (var d = 0; d < downButtons.length; d++) {
+                        downButtons[d].addEventListener("click", function () {
+                            var index = parseInt(this.getAttribute("data-index"));
+                            if (index < currentTokens.length - 1) {
+                                var temp = currentTokens[index + 1];
+                                currentTokens[index + 1] = currentTokens[index];
+                                currentTokens[index] = temp;
+                                render();
+                                updateHidden();
+                            }
+                        });
+                    }
+                }
+
+                render();
+                updateHidden();
+            }
+
+            var matchingContainers = document.querySelectorAll(".matching-container");
+            for (var i = 0; i < matchingContainers.length; i++) {
+                var container = matchingContainers[i];
+                var questionCard = container.closest(".panel-body");
+                var jsonInput = questionCard.querySelector(".matching-json-source");
+                var hiddenAnswerInput = questionCard.querySelector(".selected-answer-json");
+                renderMatching(container, jsonInput, hiddenAnswerInput);
+            }
+
+            var reorderContainers = document.querySelectorAll(".reorder-container");
+            for (var j = 0; j < reorderContainers.length; j++) {
+                var reorderContainer = reorderContainers[j];
+                var reorderCard = reorderContainer.closest(".panel-body");
+                var reorderJsonInput = reorderCard.querySelector(".reorder-json-source");
+                var reorderHiddenAnswerInput = reorderCard.querySelector(".selected-answer-json");
+                renderReorder(reorderContainer, reorderJsonInput, reorderHiddenAnswerInput);
+            }
+        })();
+    </script>
+}

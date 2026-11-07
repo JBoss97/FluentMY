@@ -1,0 +1,43 @@
+﻿@model IEnumerable<FluentMY.Models.StudentCourse>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "My Courses";
+}
+
+<div class="container">
+    <h2 style="font-weight:900;">My Courses</h2>
+
+    @if (!Model.Any())
+    {
+        <p class="text-muted">You haven’t enrolled in any course yet.</p>
+        <a class="btn btn-primary" href="@Url.Action("Index","Courses")">Browse Courses</a>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var sc in Model)
+            {
+                <div class="col-md-4" style="margin-bottom:15px;">
+                    <div class="panel panel-default" style="border-radius:12px;">
+                        <div class="panel-body">
+                            <div style="font-weight:800;">@sc.Course.Title</div>
+                            <div class="text-muted">@sc.Course.Language • @sc.Course.Level</div>
+                            <hr />
+                            @if (sc.CurrentLessonId.HasValue)
+                            {
+                                <a class="btn btn-primary btn-sm"
+                                   href="@Url.Action("Details","Lessons", new { id = sc.CurrentLessonId.Value })">
+                                    Continue
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">No lessons available yet.</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,443 @@
+﻿@using System
+@model FluentMY.ViewModels.EducatorGamePlaySessionDetailViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Game Play Session Review";
+
+    var progressPercent = Model.TotalQuestions > 0
+        ? (int)Math.Round((Model.CorrectAnswers * 100.0) / Model.TotalQuestions)
+        : 0;
+
+    var progressStyle = "width:" + progressPercent + "%;";
+}
+
+<style>
+    .session-shell {
+        color: #1f2937;
+    }
+
+    .session-hero {
+        border-radius: 24px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 30px;
+        margin-bottom: 24px;
+        box-shadow: 0 18px 36px rgba(13, 110, 253, 0.20);
+    }
+
+        .session-hero h2 {
+            margin: 0 0 8px;
+            font-weight: 900;
+        }
+
+        .session-hero p {
+            margin: 0;
+            color: rgba(255,255,255,0.88);
+        }
+
+    .hero-meta {
+        margin-top: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .hero-pill {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.16);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .session-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 22px;
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        margin-top: 0;
+        margin-bottom: 16px;
+        font-weight: 800;
+        color: #111827;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .summary-box {
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 18px;
+        text-align: center;
+    }
+
+    .summary-value {
+        font-size: 30px;
+        font-weight: 900;
+        color: #0d6efd;
+        line-height: 1.2;
+    }
+
+    .summary-label {
+        margin-top: 6px;
+        color: #6b7280;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .progress-wrap {
+        margin-top: 10px;
+    }
+
+    .progress-track {
+        width: 100%;
+        height: 12px;
+        border-radius: 999px;
+        background: #dbeafe;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+    }
+
+    .progress-meta {
+        margin-top: 8px;
+        font-size: 13px;
+        color: #6b7280;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 12px;
+    }
+
+    .info-item {
+        background: #f8fafc;
+        border-radius: 14px;
+        padding: 14px 16px;
+    }
+
+    .info-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 6px;
+    }
+
+    .info-value {
+        color: #111827;
+        font-weight: 700;
+        line-height: 1.6;
+    }
+
+    .attempt-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .attempt-card {
+        border: 1px solid #dbeafe;
+        background: #f8fbff;
+        border-radius: 18px;
+        padding: 18px;
+    }
+
+    .attempt-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+    }
+
+    .attempt-number {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: #dbeafe;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .prompt-title {
+        font-size: 16px;
+        font-weight: 800;
+        color: #111827;
+        line-height: 1.6;
+    }
+
+    .status-good,
+    .status-bad,
+    .xp-pill {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-left: 6px;
+        margin-bottom: 6px;
+    }
+
+    .status-good {
+        background: #ecfdf3;
+        color: #15803d;
+    }
+
+    .status-bad {
+        background: #fef2f2;
+        color: #b91c1c;
+    }
+
+    .xp-pill {
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    .attempt-body {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .answer-box {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 14px;
+    }
+
+    .answer-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 6px;
+    }
+
+    .answer-value {
+        color: #374151;
+        line-height: 1.7;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    .json-box {
+        background: #0f172a;
+        color: #e2e8f0;
+        border-radius: 12px;
+        padding: 12px;
+        font-family: Consolas, monospace;
+        font-size: 12px;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    .footer-actions .btn {
+        border-radius: 12px;
+        font-weight: 700;
+        padding: 10px 16px;
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 28px;
+        color: #6b7280;
+        border: 1px dashed rgba(15,23,42,0.12);
+        border-radius: 16px;
+        background: #fff;
+    }
+
+    @@media (max-width: 767px) {
+        .session-hero {
+            padding: 22px;
+        }
+
+        .summary-value {
+            font-size: 26px;
+        }
+    }
+</style>
+
+<div class="session-shell">
+    <div class="session-hero">
+        <h2>Game Play Session Review</h2>
+        <p>Review the learner’s completed game play session, score breakdown, and answer-by-answer performance.</p>
+
+        <div class="hero-meta">
+            <span class="hero-pill">@Model.StudentName</span>
+            <span class="hero-pill">@Model.CourseTitle</span>
+            <span class="hero-pill">@Model.LessonTitle</span>
+            <span class="hero-pill">@Model.SubmittedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</span>
+        </div>
+    </div>
+
+    <div class="session-card">
+        <h3 class="section-title">Session Summary</h3>
+
+        <div class="summary-grid">
+            <div class="summary-box">
+                <div class="summary-value">@Model.TotalQuestions</div>
+                <div class="summary-label">Total Questions</div>
+            </div>
+
+            <div class="summary-box">
+                <div class="summary-value">@Model.CorrectAnswers</div>
+                <div class="summary-label">Correct Answers</div>
+            </div>
+
+            <div class="summary-box">
+                <div class="summary-value">@Model.WrongAnswers</div>
+                <div class="summary-label">Wrong Answers</div>
+            </div>
+
+            <div class="summary-box">
+                <div class="summary-value">@Model.TotalXP</div>
+                <div class="summary-label">Total XP</div>
+            </div>
+
+            <div class="summary-box">
+                <div class="summary-value">@Model.Percentage%</div>
+                <div class="summary-label">Accuracy Score</div>
+            </div>
+        </div>
+
+        <div class="progress-wrap">
+            <div class="progress-track">
+                <div class="progress-fill" style="@progressStyle"></div>
+            </div>
+            <div class="progress-meta">
+                <span>Correct Rate: @progressPercent%</span>
+                <span>@Model.CorrectAnswers correct out of @Model.TotalQuestions</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="session-card">
+        <h3 class="section-title">Session Info</h3>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Student</div>
+                <div class="info-value">@Model.StudentName</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Course</div>
+                <div class="info-value">@Model.CourseTitle</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Lesson</div>
+                <div class="info-value">@Model.LessonTitle</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Submitted Time</div>
+                <div class="info-value">@Model.SubmittedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="session-card">
+        <h3 class="section-title">Question Review</h3>
+
+        @if (Model.Answers == null || !Model.Answers.Any())
+        {
+            <div class="empty-state">
+                No answer records are available for this game play session.
+            </div>
+        }
+        else
+        {
+            <div class="attempt-list">
+                @{
+                    var number = 1;
+                }
+
+                @foreach (var item in Model.Answers)
+                {
+                    <div class="attempt-card">
+                        <div class="attempt-top">
+                            <div>
+                                <div class="attempt-number">Question #@number</div>
+                                <div class="prompt-title">@item.PromptText</div>
+                            </div>
+
+                            <div>
+                                @if (item.IsCorrect)
+                                {
+                                    <span class="status-good">Correct</span>
+                                }
+                                else
+                                {
+                                    <span class="status-bad">Wrong</span>
+                                }
+
+                                <span class="xp-pill">XP: @item.XPGranted</span>
+                            </div>
+                        </div>
+
+                        <div class="attempt-body">
+                            <div class="answer-box">
+                                <div class="answer-label">Submitted Answer</div>
+                                <div class="answer-value">
+                                    @if (!string.IsNullOrWhiteSpace(item.SubmittedAnswer))
+                                    {
+                                        @item.SubmittedAnswer
+                                    }
+                                    else
+                                    {
+                                        <text>-</text>
+                                    }
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(item.SubmittedAnswerJson))
+                            {
+                                <div class="answer-box">
+                                    <div class="answer-label">Answer Data</div>
+                                    <div class="json-box">@item.SubmittedAnswerJson</div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    number++;
+                }
+            </div>
+        }
+
+        <div class="footer-actions" style="margin-top:20px;">
+            <a class="btn btn-default" href="javascript:history.back()">Back</a>
+            <a class="btn btn-primary" href="@Url.Action("Index", "Educator")">Go to Dashboard</a>
+        </div>
+    </div>
+</div>

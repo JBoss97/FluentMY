@@ -1,0 +1,22 @@
+﻿@model FluentMY.Models.ContactEnquiry
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Enquiry Details";
+}
+
+<h2>Enquiry Details</h2>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <p><strong>Name:</strong> @Model.FullName</p>
+        <p><strong>Email:</strong> @Model.Email</p>
+        <p><strong>Role:</strong> @Model.Role</p>
+        <p><strong>Subject:</strong> @Model.Subject</p>
+        <p><strong>Submitted:</strong> @Model.SubmittedAtUtc.ToLocalTime().ToString("dd MMM yyyy HH:mm")</p>
+        <hr />
+        <p><strong>Message:</strong></p>
+        <p style="white-space: pre-line;">@Model.Message</p>
+    </div>
+</div>
+
+<a class="btn btn-default" href="@Url.Action("Index")">Back to Enquiries</a>

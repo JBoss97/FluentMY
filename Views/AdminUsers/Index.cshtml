@@ -1,0 +1,525 @@
+﻿@using System.Linq
+@model FluentMY.ViewModels.AdminUserIndexViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Manage Users";
+}
+
+<style>
+    .user-shell {
+        color: #1f2937;
+    }
+
+    .user-hero {
+        border-radius: 24px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 30px;
+        margin-bottom: 24px;
+        box-shadow: 0 18px 36px rgba(13, 110, 253, 0.20);
+    }
+
+        .user-hero h2 {
+            margin: 0 0 8px;
+            font-weight: 900;
+        }
+
+        .user-hero p {
+            margin: 0;
+            color: rgba(255,255,255,0.88);
+        }
+
+        .user-hero .btn {
+            border-radius: 12px;
+            font-weight: 700;
+            padding: 10px 16px;
+            margin-top: 14px;
+            margin-right: 8px;
+        }
+
+    .filter-card,
+    .user-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 22px;
+        margin-bottom: 20px;
+    }
+
+        .filter-card .form-control {
+            border-radius: 12px;
+            min-height: 44px;
+        }
+
+    .filter-actions .btn {
+        margin-right: 8px;
+        margin-top: 8px;
+        border-radius: 12px;
+        font-weight: 700;
+    }
+
+    .role-pill,
+    .yes-pill,
+    .no-pill,
+    .self-pill,
+    .ownership-pill {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .role-pill {
+        background: #eff6ff;
+        color: #0d6efd;
+    }
+
+    .yes-pill {
+        background: #ecfdf3;
+        color: #15803d;
+    }
+
+    .no-pill {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .self-pill {
+        background: #eef2ff;
+        color: #4338ca;
+        margin-left: 6px;
+    }
+
+    .ownership-pill {
+        background: #f3f4f6;
+        color: #374151;
+        margin-right: 6px;
+    }
+
+    .user-table > thead > tr > th {
+        border-top: none !important;
+        font-weight: 700;
+    }
+
+        .user-table > thead > tr > th > a {
+            color: #111827;
+            text-decoration: none;
+        }
+
+    .action-group .btn {
+        margin-right: 6px;
+        margin-bottom: 6px;
+    }
+
+    .table-note {
+        color: #6b7280;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .pager-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+    }
+
+    .pager-links .btn {
+        margin-right: 6px;
+        margin-bottom: 6px;
+        border-radius: 12px;
+        font-weight: 700;
+    }
+
+    .pager-meta {
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .bulk-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+
+    .bulk-note {
+        color: #6b7280;
+        font-size: 13px;
+        margin-bottom: 14px;
+    }
+</style>
+
+@functions {
+    public string NextDirection(string currentSortBy, string currentSortDirection, string column)
+    {
+        if ((currentSortBy ?? "").ToLower() == column.ToLower() && (currentSortDirection ?? "asc").ToLower() == "asc")
+        {
+            return "desc";
+        }
+
+        return "asc";
+    }
+}
+
+<div class="user-shell">
+    <div class="user-hero">
+        <h2>Manage Users</h2>
+        <p>View, create, search, filter, sort, edit, and manage user ownership safely.</p>
+
+        <div>
+            <a class="btn btn-light" href="@Url.Action("Create")">Create User</a>
+            <a class="btn btn-default" href="@Url.Action("ExportCsv", new {
+                searchTerm = Model.SearchTerm,
+                selectedRole = Model.SelectedRole,
+                emailConfirmed = Model.EmailConfirmed,
+                sortBy = Model.SortBy,
+                sortDirection = Model.SortDirection
+            })">Export CSV</a>
+        </div>
+    </div>
+
+    @if (TempData["AdminUserMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["AdminUserMessage"]</div>
+    }
+
+    <div class="filter-card">
+        @using (Html.BeginForm("Index", "AdminUsers", FormMethod.Get))
+        {
+            <div class="row">
+                <div class="col-md-4">
+                    <label>Search</label>
+                    <input type="text"
+                           name="searchTerm"
+                           value="@Model.SearchTerm"
+                           class="form-control"
+                           placeholder="Search by name, username, email, or role" />
+                </div>
+
+                <div class="col-md-2">
+                    <label>Role</label>
+                    @Html.DropDownList(
+                        "selectedRole",
+                        new SelectList(Model.AvailableRoles, "Value", "Text", Model.SelectedRole),
+                        "-- All Roles --",
+                        new { @class = "form-control" })
+                </div>
+
+                <div class="col-md-2">
+                    <label>Email Confirmed</label>
+                    <select name="emailConfirmed" class="form-control">
+                        <option value="">-- All --</option>
+                        @if (Model.EmailConfirmed == true)
+                        {
+                            <option value="true" selected="selected">Yes</option>
+                        }
+                        else
+                        {
+                            <option value="true">Yes</option>
+                        }
+
+                        @if (Model.EmailConfirmed == false)
+                        {
+                            <option value="false" selected="selected">No</option>
+                        }
+                        else
+                        {
+                            <option value="false">No</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label>Page Size</label>
+                    <select name="pageSize" class="form-control">
+                        <option value="5" @(Model.PageSize == 5 ? "selected=\"selected\"" : "")>5</option>
+                        <option value="10" @(Model.PageSize == 10 ? "selected=\"selected\"" : "")>10</option>
+                        <option value="20" @(Model.PageSize == 20 ? "selected=\"selected\"" : "")>20</option>
+                        <option value="50" @(Model.PageSize == 50 ? "selected=\"selected\"" : "")>50</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <input type="hidden" name="sortBy" value="@Model.SortBy" />
+                    <input type="hidden" name="sortDirection" value="@Model.SortDirection" />
+                    <input type="hidden" name="page" value="1" />
+
+                    <div class="filter-actions">
+                        <button type="submit" class="btn btn-primary">Apply</button>
+                        <a class="btn btn-default" href="@Url.Action("Index")">Reset</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="user-card">
+        <div class="table-note">
+            Showing @Model.Users.Count of @Model.TotalCount user(s)
+        </div>
+
+        @using (Html.BeginForm("BulkAction", "AdminUsers", FormMethod.Post, new { id = "bulkActionForm" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" name="SearchTerm" value="@Model.SearchTerm" />
+            <input type="hidden" name="SelectedRole" value="@Model.SelectedRole" />
+            <input type="hidden" name="EmailConfirmed" value="@(Model.EmailConfirmed.HasValue ? Model.EmailConfirmed.Value.ToString().ToLower() : "")" />
+            <input type="hidden" name="SortBy" value="@Model.SortBy" />
+            <input type="hidden" name="SortDirection" value="@Model.SortDirection" />
+            <input type="hidden" name="Page" value="@Model.Page" />
+            <input type="hidden" name="PageSize" value="@Model.PageSize" />
+
+            <div class="bulk-toolbar">
+                <select name="ActionName" class="form-control" style="max-width:240px; display:inline-block;">
+                    <option value="">-- Bulk Action --</option>
+                    <option value="confirm-email">Confirm Email</option>
+                    <option value="delete">Delete Selected</option>
+                    <option value="reassign-ownership">Bulk Reassign Ownership</option>
+                </select>
+
+                <button type="submit" class="btn btn-primary" style="margin-left:8px;">Apply</button>
+            </div>
+
+            <div class="bulk-note">
+                Use <strong>Bulk Reassign Ownership</strong> for selected educators who currently own courses or lessons.
+            </div>
+
+            <table class="table table-striped user-table">
+                <thead>
+                    <tr>
+                        <th style="width:40px;">
+                            <input type="checkbox" id="checkAllUsers" />
+                        </th>
+                        <th>
+                            <a href="@Url.Action("Index", new {
+                            searchTerm = Model.SearchTerm,
+                            selectedRole = Model.SelectedRole,
+                            emailConfirmed = Model.EmailConfirmed,
+                            pageSize = Model.PageSize,
+                            page = 1,
+                            sortBy = "fullname",
+                            sortDirection = NextDirection(Model.SortBy, Model.SortDirection, "fullname")
+                        })">Full Name</a>
+                        </th>
+                        <th>
+                            <a href="@Url.Action("Index", new {
+                            searchTerm = Model.SearchTerm,
+                            selectedRole = Model.SelectedRole,
+                            emailConfirmed = Model.EmailConfirmed,
+                            pageSize = Model.PageSize,
+                            page = 1,
+                            sortBy = "username",
+                            sortDirection = NextDirection(Model.SortBy, Model.SortDirection, "username")
+                        })">Username</a>
+                        </th>
+                        <th>
+                            <a href="@Url.Action("Index", new {
+                            searchTerm = Model.SearchTerm,
+                            selectedRole = Model.SelectedRole,
+                            emailConfirmed = Model.EmailConfirmed,
+                            pageSize = Model.PageSize,
+                            page = 1,
+                            sortBy = "email",
+                            sortDirection = NextDirection(Model.SortBy, Model.SortDirection, "email")
+                        })">Email</a>
+                        </th>
+                        <th>
+                            <a href="@Url.Action("Index", new {
+                            searchTerm = Model.SearchTerm,
+                            selectedRole = Model.SelectedRole,
+                            emailConfirmed = Model.EmailConfirmed,
+                            pageSize = Model.PageSize,
+                            page = 1,
+                            sortBy = "role",
+                            sortDirection = NextDirection(Model.SortBy, Model.SortDirection, "role")
+                        })">Role</a>
+                        </th>
+                        <th>Ownership</th>
+                        <th>
+                            <a href="@Url.Action("Index", new {
+                            searchTerm = Model.SearchTerm,
+                            selectedRole = Model.SelectedRole,
+                            emailConfirmed = Model.EmailConfirmed,
+                            pageSize = Model.PageSize,
+                            page = 1,
+                            sortBy = "emailconfirmed",
+                            sortDirection = NextDirection(Model.SortBy, Model.SortDirection, "emailconfirmed")
+                        })">Email Confirmed</a>
+                        </th>
+                        <th>
+                            <a href="@Url.Action("Index", new {
+                            searchTerm = Model.SearchTerm,
+                            selectedRole = Model.SelectedRole,
+                            emailConfirmed = Model.EmailConfirmed,
+                            pageSize = Model.PageSize,
+                            page = 1,
+                            sortBy = "joined",
+                            sortDirection = NextDirection(Model.SortBy, Model.SortDirection, "joined")
+                        })">Joined</a>
+                        </th>
+                        <th style="width:260px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Users == null || !Model.Users.Any())
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center text-muted">No users found.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var user in Model.Users)
+                        {
+                            <tr>
+                                <td>
+                                    @if (!user.IsSelf)
+                                    {
+                                        <input type="checkbox" name="SelectedUserIds" value="@user.UserId" class="user-check" />
+                                    }
+                                </td>
+                                <td>@(string.IsNullOrWhiteSpace(user.FullName) ? "-" : user.FullName)</td>
+                                <td>@user.UserName</td>
+                                <td>@user.Email</td>
+                                <td>
+                                    <span class="role-pill">@user.RoleName</span>
+                                    @if (user.IsSelf)
+                                    {
+                                        <span class="self-pill">You</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (user.HasOwnedContent)
+                                    {
+                                        if (user.OwnedCourseCount > 0)
+                                        {
+                                            <span class="ownership-pill">@user.OwnedCourseCount course(s)</span>
+                                        }
+                                        if (user.OwnedLessonCount > 0)
+                                        {
+                                            <span class="ownership-pill">@user.OwnedLessonCount lesson(s)</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (user.EmailConfirmed)
+                                    {
+                                        <span class="yes-pill">Yes</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="no-pill">No</span>
+                                    }
+                                </td>
+                                <td>@(user.JoinedAt.HasValue ? user.JoinedAt.Value.ToString("dd MMM yyyy") : "-")</td>
+                                <td>
+                                    <div class="action-group">
+                                        <a class="btn btn-xs btn-primary" href="@Url.Action("Edit", new { id = user.UserId })">Edit</a>
+
+                                        @if (user.RoleName == "Educator" && user.HasOwnedContent)
+                                        {
+                                            <a class="btn btn-xs btn-warning" href="@Url.Action("ReassignOwnership", new { id = user.UserId })">Reassign</a>
+                                        }
+
+                                        @if (!user.IsSelf)
+                                        {
+                                            <a class="btn btn-xs btn-info" href="@Url.Action("ResetPassword", new { id = user.UserId })">Reset Password</a>
+                                            <a class="btn btn-xs btn-danger" href="@Url.Action("Delete", new { id = user.UserId })">Delete</a>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-xs btn-default" disabled="disabled">Reset Password</button>
+                                            <button class="btn btn-xs btn-default" disabled="disabled">Delete</button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        }
+
+        <div class="pager-bar">
+            <div class="pager-meta">
+                Page @Model.Page of @Model.TotalPages
+            </div>
+
+            <div class="pager-links">
+                @if (Model.Page > 1)
+                {
+                    <a class="btn btn-default btn-sm" href="@Url.Action("Index", new {
+                    searchTerm = Model.SearchTerm,
+                    selectedRole = Model.SelectedRole,
+                    emailConfirmed = Model.EmailConfirmed,
+                    sortBy = Model.SortBy,
+                    sortDirection = Model.SortDirection,
+                    pageSize = Model.PageSize,
+                    page = 1
+                })">First</a>
+
+                    <a class="btn btn-default btn-sm" href="@Url.Action("Index", new {
+                    searchTerm = Model.SearchTerm,
+                    selectedRole = Model.SelectedRole,
+                    emailConfirmed = Model.EmailConfirmed,
+                    sortBy = Model.SortBy,
+                    sortDirection = Model.SortDirection,
+                    pageSize = Model.PageSize,
+                    page = Model.Page - 1
+                })">Previous</a>
+                }
+
+                @if (Model.Page < Model.TotalPages)
+                {
+                    <a class="btn btn-default btn-sm" href="@Url.Action("Index", new {
+                    searchTerm = Model.SearchTerm,
+                    selectedRole = Model.SelectedRole,
+                    emailConfirmed = Model.EmailConfirmed,
+                    sortBy = Model.SortBy,
+                    sortDirection = Model.SortDirection,
+                    pageSize = Model.PageSize,
+                    page = Model.Page + 1
+                })">Next</a>
+
+                    <a class="btn btn-default btn-sm" href="@Url.Action("Index", new {
+                    searchTerm = Model.SearchTerm,
+                    selectedRole = Model.SelectedRole,
+                    emailConfirmed = Model.EmailConfirmed,
+                    sortBy = Model.SortBy,
+                    sortDirection = Model.SortDirection,
+                    pageSize = Model.PageSize,
+                    page = Model.TotalPages
+                })">Last</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        (function () {
+            var checkAll = document.getElementById('checkAllUsers');
+            if (!checkAll) return;
+
+            checkAll.addEventListener('change', function () {
+                var checkboxes = document.querySelectorAll('.user-check');
+                for (var i = 0; i < checkboxes.length; i++) {
+                    checkboxes[i].checked = checkAll.checked;
+                }
+            });
+        })();
+    </script>
+}

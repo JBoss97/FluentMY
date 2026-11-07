@@ -1,0 +1,51 @@
+﻿@model IEnumerable<FluentMY.ViewModels.StudentSubmissionHistoryItemViewModel>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "My Submission History";
+}
+
+<div class="container">
+    <h2 style="font-weight:900;">My Submission History</h2>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">You have no submissions yet.</div>
+    }
+    else
+    {
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Course</th>
+                    <th>Lesson</th>
+                    <th>Attempt</th>
+                    <th>Correct</th>
+                    <th>Score</th>
+                    <th>Percentage</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.CourseTitle</td>
+                        <td>@item.LessonTitle</td>
+                        <td>@item.AttemptNumber</td>
+                        <td>@item.CorrectAnswers / @item.TotalQuestions</td>
+                        <td>@item.TotalScore</td>
+                        <td>@item.Percentage%</td>
+                        <td>@item.SubmittedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+                        <td>
+                            <a class="btn btn-xs btn-primary"
+                               href="@Url.Action("Result", "StudentSubmissions", new { id = item.SubmissionId })">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

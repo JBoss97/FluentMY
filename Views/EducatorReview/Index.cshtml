@@ -1,0 +1,233 @@
+﻿@model IEnumerable<FluentMY.ViewModels.EducatorSubmissionListItemViewModel>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Submission Viewing";
+}
+
+<style>
+    .review-shell {
+        color: #1f2937;
+    }
+
+    .review-hero {
+        border-radius: 22px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 28px;
+        margin-bottom: 24px;
+        box-shadow: 0 16px 35px rgba(13, 110, 253, 0.20);
+    }
+
+        .review-hero h2 {
+            margin: 0 0 8px;
+            font-weight: 800;
+        }
+
+        .review-hero p {
+            margin: 0;
+            color: rgba(255,255,255,0.88);
+        }
+
+    .review-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+
+        .review-toolbar .btn {
+            border-radius: 12px;
+            font-weight: 600;
+            padding: 10px 16px;
+        }
+
+    .review-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 22px;
+    }
+
+    .review-table {
+        margin-bottom: 0;
+    }
+
+        .review-table > thead > tr > th {
+            border-top: none !important;
+            color: #374151;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+
+        .review-table > tbody > tr > td {
+            vertical-align: middle;
+        }
+
+    .student-name {
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .muted-small {
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .score-pill {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #0d6efd;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .status-reviewed {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: #ecfdf3;
+        color: #15803d;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .status-pending {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: #fff7ed;
+        color: #c2410c;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .action-group .btn {
+        margin-right: 6px;
+        margin-bottom: 6px;
+        border-radius: 10px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 36px 20px;
+        border: 1px dashed rgba(15, 23, 42, 0.12);
+        border-radius: 16px;
+        background: #fff;
+    }
+
+        .empty-state h4 {
+            font-weight: 800;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: #6b7280;
+            margin-bottom: 16px;
+        }
+</style>
+
+<div class="review-shell">
+    <div class="review-hero">
+        <h2>Lesson Activity Feedback</h2>
+        <p>
+            <strong>Course:</strong> @ViewBag.CourseTitle &nbsp;•&nbsp;
+            <strong>Lesson:</strong> @ViewBag.LessonTitle
+        </p>
+    </div>
+
+    <div class="review-toolbar">
+        <div class="muted-small">Give feedback for quiz submissions and completed game play attempts for this lesson.</div>
+        <div>
+            <a class="btn btn-default" href="@Url.Action("Index", "EducatorLessons", new { courseId = ViewBag.CourseId })">Back to Lessons</a>
+        </div>
+    </div>
+
+    <div class="review-card">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="empty-state">
+                <h4>No student submissions yet</h4>
+                <p>Once students complete this lesson activities, their results will appear here for feedback.</p>
+                <a class="btn btn-default" href="@Url.Action("Index", "EducatorLessons", new { courseId = ViewBag.CourseId })">Back to Lessons</a>
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped review-table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Attempt</th>
+                        <th>Correct</th>
+                        <th>Score</th>
+                        <th>Percentage</th>
+                        <th>Commented</th>
+                        <th>Submitted</th>
+                        <th style="width:120px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="student-name">@item.StudentName</div>
+                                <div class="muted-small">@item.ActivityType</div>
+                            </td>
+                            <td>@item.AttemptNumber</td>
+                            <td>@item.CorrectAnswers / @item.TotalQuestions</td>
+                            <td>@item.TotalScore</td>
+                            <td>
+                                <span class="score-pill">@item.Percentage%</span>
+                            </td>
+                            <td>
+                                @if (item.ActivityType == "Quiz")
+                                {
+                                    if (item.IsReviewed)
+                                    {
+                                        <span class="status-reviewed">Commented</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-pending">Pending</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="status-reviewed">Completed</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="muted-small">@item.SubmittedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</span>
+                            </td>
+                            <td>
+                                <div class="action-group">
+                                    @if (item.ActivityType == "Quiz")
+                                    {
+                                        <a class="btn btn-xs btn-primary"
+                                           href="@Url.Action("Details", new { submissionId = item.SubmissionId })">
+                                            Review
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a class="btn btn-xs btn-primary"
+                                           href="@Url.Action("SessionDetails", new { sessionId = item.LessonSessionId })">
+                                            View
+                                        </a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

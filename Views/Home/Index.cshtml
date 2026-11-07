@@ -1,0 +1,505 @@
+﻿@model FluentMY.ViewModels.HomeIndexViewModel
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<style>
+    .home-shell {
+        color: #1f2937;
+    }
+
+    .hero {
+        background: linear-gradient(135deg, #eaf3ff 0%, #ffffff 100%);
+        border-radius: 24px;
+        padding: 56px 30px;
+        margin-top: 12px;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 16px 36px rgba(12, 38, 76, 0.08);
+    }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 180px;
+            height: 180px;
+            background: rgba(13, 110, 253, 0.08);
+            border-radius: 50%;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            bottom: -50px;
+            left: -40px;
+            width: 160px;
+            height: 160px;
+            background: rgba(11, 77, 183, 0.06);
+            border-radius: 50%;
+        }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero h1 {
+        font-weight: 900;
+        letter-spacing: -0.8px;
+        margin-bottom: 12px;
+        line-height: 1.15;
+        color: #0f172a;
+    }
+
+    .hero .lead {
+        color: #475569;
+        max-width: 720px;
+        font-size: 18px;
+        line-height: 1.7;
+        margin-bottom: 18px;
+    }
+
+    .hero-badges .badge {
+        margin-right: 8px;
+        margin-bottom: 8px;
+        padding: 8px 12px;
+        font-weight: 700;
+        border-radius: 999px;
+        font-size: 12px;
+    }
+
+    .hero-actions .btn {
+        margin-right: 10px;
+        margin-bottom: 10px;
+        border-radius: 12px;
+        padding: 11px 18px;
+        font-weight: 700;
+    }
+
+    .hero-note {
+        margin-top: 10px;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .hero-art {
+        border-radius: 18px;
+        background: #fff;
+        padding: 20px;
+        box-shadow: 0 14px 30px rgba(12, 38, 76, 0.12);
+        border: 1px solid rgba(15, 23, 42, 0.05);
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-mini-card {
+        background: #f8fbff;
+        border-radius: 14px;
+        padding: 14px;
+        margin-bottom: 12px;
+        border: 1px solid rgba(13, 110, 253, 0.08);
+    }
+
+    .mini-title {
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+
+    .mini-text {
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .feature-card,
+    .course-card,
+    .steps-card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 12px 26px rgba(12, 38, 76, 0.08);
+        border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .feature-card {
+        padding: 20px;
+        height: 100%;
+    }
+
+    .feature-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 20px;
+        background: #f2f7ff;
+        margin-bottom: 12px;
+    }
+
+    .feature-card h4 {
+        font-weight: 800;
+        margin-top: 0;
+        margin-bottom: 8px;
+    }
+
+    .section-title {
+        font-weight: 900;
+        margin-top: 6px;
+        margin-bottom: 18px;
+        color: #111827;
+    }
+
+    .section-subtitle {
+        color: #6b7280;
+        margin-bottom: 20px;
+        max-width: 720px;
+    }
+
+    .course-card {
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .course-thumb {
+        height: 130px;
+        background: linear-gradient(135deg, #e9f2ff 0%, #fff 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        color: #1b4a9b;
+        letter-spacing: -0.5px;
+        font-size: 20px;
+    }
+
+    .course-body {
+        padding: 16px;
+    }
+
+        .course-body h4 {
+            font-weight: 800;
+            margin-top: 0;
+            margin-bottom: 6px;
+        }
+
+    .course-meta {
+        color: #666;
+        font-size: 13px;
+        margin-bottom: 10px;
+    }
+
+    .course-desc {
+        color: #4b5563;
+        min-height: 48px;
+        margin-bottom: 14px;
+        line-height: 1.6;
+    }
+
+    .course-actions .btn {
+        border-radius: 12px;
+        font-weight: 700;
+    }
+
+    .steps-card {
+        padding: 20px;
+        height: 100%;
+    }
+
+    .step-number {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #eff6ff;
+        color: #0d6efd;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        margin-bottom: 10px;
+    }
+
+    .steps-card h4 {
+        font-weight: 800;
+        margin-top: 0;
+        margin-bottom: 8px;
+    }
+
+    .cta {
+        border-radius: 20px;
+        background: linear-gradient(135deg, #0b2c5a 0%, #123d76 100%);
+        color: #fff;
+        padding: 32px 24px;
+        margin-top: 28px;
+        margin-bottom: 12px;
+        box-shadow: 0 16px 30px rgba(11, 44, 90, 0.18);
+    }
+
+        .cta h3 {
+            font-weight: 900;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .cta p {
+            color: rgba(255,255,255,0.86);
+            margin-bottom: 0;
+        }
+
+        .cta .btn {
+            border-radius: 12px;
+            font-weight: 700;
+            padding: 11px 18px;
+        }
+
+    @@media (max-width: 991px) {
+        .hero {
+            padding: 36px 22px;
+        }
+    }
+</style>
+
+<main class="container home-shell">
+
+    <section class="hero">
+        <div class="row">
+            <div class="col-md-7 hero-content">
+                <div class="hero-badges mb-2">
+                    <span class="badge bg-primary">Interactive Lessons</span>
+                    <span class="badge bg-secondary">Malaysian Context</span>
+                    <span class="badge bg-success">AI Feedback</span>
+                </div>
+
+                <h1>Master Languages. <br />Embrace Malaysia. Learn with FluentMY.</h1>
+
+                <p class="lead">
+                    Learn Bahasa Malaysia, English, Mandarin, and Tamil through short lessons,
+                    local real-life scenarios, quizzes, and guided practice designed for everyday use.
+                </p>
+
+                <div class="hero-actions">
+                    @if (Model.RecommendedCourse != null)
+                    {
+                        <a class="btn btn-primary btn-lg" href="@Url.Action("Details", "Courses", new { id = Model.RecommendedCourse.CourseId })">Start Exploring</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-primary btn-lg" href="@Url.Action("Register", "Account")">Sign Up Free</a>
+                    }
+
+                    <a class="btn btn-outline-dark btn-lg" href="@Url.Action("Login", "Account")">Login</a>
+                </div>
+
+                <div class="hero-note">
+                    ✅ Short lessons • ✅ Quizzes • ✅ Progress tracking • ✅ Student, Educator, and Admin roles
+                </div>
+            </div>
+
+            <div class="col-md-5 mt-4 mt-md-0">
+                <div class="hero-art">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="@Url.Content("~/Content/images/fluentmy-logo.png")"
+                             alt="FluentMY"
+                             style="height:42px;width:auto;" />
+                        <div style="margin-left:12px;">
+                            <div class="mini-title">FluentMY Learning Flow</div>
+                            <div class="mini-text">Study → Quiz → Feedback → Progress</div>
+                        </div>
+                    </div>
+
+                    <div class="hero-mini-card">
+                        <div class="mini-title">Today’s Goal</div>
+                        <div class="mini-text">Finish 1 lesson and answer 5 quiz questions.</div>
+                    </div>
+
+                    @if (Model.RecommendedCourse != null)
+                    {
+                        <div class="hero-mini-card">
+                            <div class="mini-title">Recommended Start</div>
+                            <div class="mini-text">
+                                @Model.RecommendedCourse.Title
+                                @if (!string.IsNullOrWhiteSpace(Model.RecommendedCourse.Level))
+                                {
+                                    @: • @Model.RecommendedCourse.Level
+                                }
+                            </div>
+                        </div>
+
+                        <div class="hero-mini-card" style="margin-bottom:0;">
+                            <div class="mini-title">Start Here</div>
+                            <div class="mini-text" style="margin-bottom:10px;">
+                                @Model.RecommendedCourse.Language
+                                • @Model.RecommendedCourse.LessonCount lesson(s)
+                                @if (!string.IsNullOrWhiteSpace(Model.RecommendedCourse.EstimatedDuration))
+                                {
+                                    @: • @Model.RecommendedCourse.EstimatedDuration
+                                }
+                            </div>
+
+                            <a class="btn btn-sm btn-outline-primary"
+                               href="@Url.Action("Details", "Courses", new { id = Model.RecommendedCourse.CourseId })">
+                                Explore Course
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="hero-mini-card">
+                            <div class="mini-title">Recommended Start</div>
+                            <div class="mini-text">Begin with a beginner-friendly course and grow step by step.</div>
+                        </div>
+
+                        <div class="hero-mini-card" style="margin-bottom:0;">
+                            <div class="mini-title">Why it works</div>
+                            <div class="mini-text">Local vocabulary, practical communication, and instant feedback.</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="section-title">Why Choose FluentMY?</h2>
+        <p class="section-subtitle">
+            FluentMY is designed for practical language learning with content that feels relevant to life in Malaysia.
+        </p>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">🧩</div>
+                    <h4>Interactive Lessons</h4>
+                    <p class="text-muted mb-0">
+                        Learn through short modules, quizzes, and focused practice tasks that support daily progress.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">🗣️</div>
+                    <h4>Practical Communication</h4>
+                    <p class="text-muted mb-0">
+                        Build confidence with realistic situations such as dining, travelling, studying, and workplace conversations.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">✨</div>
+                    <h4>Smart Feedback</h4>
+                    <p class="text-muted mb-0">
+                        Receive immediate feedback on quiz performance so you can review mistakes and improve faster.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mt-4">
+        <h2 class="section-title">Popular Courses</h2>
+        <p class="section-subtitle">
+            Start with beginner-friendly courses built around everyday communication and local Malaysian usage.
+        </p>
+
+        @if (Model.PopularCourses == null || !Model.PopularCourses.Any())
+        {
+            <div class="alert alert-info">No courses are available yet.</div>
+        }
+        else
+        {
+            <div class="row g-3">
+                @foreach (var course in Model.PopularCourses)
+                {
+                    <div class="col-md-3">
+                        <div class="course-card">
+                            <div class="course-thumb">@course.Language</div>
+                            <div class="course-body">
+                                <h4>@course.Title</h4>
+
+                                <div class="course-meta">
+                                    @(string.IsNullOrWhiteSpace(course.Level) ? "General" : course.Level)
+                                    • @course.LessonCount lesson(s)
+                                    @if (!string.IsNullOrWhiteSpace(course.EstimatedDuration))
+                                    {
+                                        @: • @course.EstimatedDuration
+                                    }
+                                </div>
+
+                                <div class="course-desc">
+                                    @(string.IsNullOrWhiteSpace(course.Description)
+                                        ? "Start learning with structured lessons and quizzes."
+                                        : course.Description)
+                                </div>
+
+                                <div class="course-actions">
+                                    <a class="btn btn-sm btn-primary"
+                                       href="@Url.Action("Details", "Courses", new { id = course.CourseId })">
+                                        View Course
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </section>
+
+    <section class="mt-4">
+        <h2 class="section-title">How FluentMY Works</h2>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="steps-card">
+                    <div class="step-number">1</div>
+                    <h4>Choose a Course</h4>
+                    <p class="text-muted mb-0">
+                        Select a language course that matches your level and learning goals.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="steps-card">
+                    <div class="step-number">2</div>
+                    <h4>Complete Lessons</h4>
+                    <p class="text-muted mb-0">
+                        Study lesson content, follow the examples, and build understanding step by step.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="steps-card">
+                    <div class="step-number">3</div>
+                    <h4>Track Your Progress</h4>
+                    <p class="text-muted mb-0">
+                        Take quizzes, review feedback, and monitor completion from your dashboard.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h3>Ready to start learning today?</h3>
+                <p>
+                    Join FluentMY and begin your first lesson in minutes. Build confidence with structured practice and progress tracking.
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a class="btn btn-light btn-lg" href="@Url.Action("Register", "Account")">Create Account</a>
+            </div>
+        </div>
+    </section>
+
+</main>

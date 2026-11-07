@@ -1,0 +1,536 @@
+﻿@model FluentMY.ViewModels.AdminDashboardViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Admin Dashboard";
+}
+
+<style>
+    .admin-shell {
+        color: #1f2937;
+    }
+
+    .admin-hero {
+        border-radius: 24px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 30px;
+        margin-bottom: 24px;
+        box-shadow: 0 18px 36px rgba(13, 110, 253, 0.20);
+    }
+
+        .admin-hero h2 {
+            margin: 0 0 8px;
+            font-weight: 900;
+        }
+
+        .admin-hero p {
+            margin: 0;
+            color: rgba(255,255,255,0.88);
+        }
+
+    .hero-actions .btn {
+        margin-top: 14px;
+        margin-right: 10px;
+        margin-bottom: 8px;
+        border-radius: 12px;
+        font-weight: 700;
+        padding: 10px 16px;
+    }
+
+    .dashboard-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 20px;
+        margin-bottom: 20px;
+        height: 100%;
+    }
+
+    .stats-card {
+        text-align: center;
+        padding: 22px 16px;
+    }
+
+    .stats-number {
+        font-size: 30px;
+        font-weight: 900;
+        color: #0d6efd;
+        margin-bottom: 4px;
+    }
+
+    .stats-label {
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .section-title {
+        font-weight: 900;
+        margin-top: 0;
+        margin-bottom: 16px;
+        color: #111827;
+    }
+
+    .status-reviewed,
+    .status-pending {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .status-reviewed {
+        background: #ecfdf3;
+        color: #15803d;
+    }
+
+    .status-pending {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .recent-table {
+        margin-bottom: 0;
+    }
+
+        .recent-table > thead > tr > th {
+            border-top: none !important;
+            font-weight: 700;
+        }
+
+    .quick-link-card {
+        border-radius: 18px;
+        padding: 20px;
+        background: #fff;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        margin-bottom: 20px;
+        height: 100%;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+        .quick-link-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 32px rgba(15,23,42,0.10);
+        }
+
+    .quick-link-title {
+        font-size: 18px;
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+
+    .quick-link-desc {
+        color: #6b7280;
+        line-height: 1.6;
+        min-height: 50px;
+        margin-bottom: 14px;
+    }
+
+    .quick-link-badge {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 14px;
+    }
+
+    .theme-indigo .quick-link-badge {
+        background: #e0e7ff;
+        color: #3730a3;
+    }
+
+    .theme-blue .quick-link-badge {
+        background: #e0f2fe;
+        color: #075985;
+    }
+
+    .theme-green .quick-link-badge {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .theme-amber .quick-link-badge {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .theme-slate .quick-link-badge {
+        background: #f1f5f9;
+        color: #334155;
+    }
+
+    .alert-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .alert-item {
+        border-radius: 16px;
+        padding: 18px;
+        margin-bottom: 14px;
+        border: 1px solid transparent;
+    }
+
+        .alert-item:last-child {
+            margin-bottom: 0;
+        }
+
+    .alert-info-box {
+        background: #eff6ff;
+        border-color: #bfdbfe;
+    }
+
+    .alert-warning-box {
+        background: #fffbeb;
+        border-color: #fde68a;
+    }
+
+    .alert-danger-box {
+        background: #fef2f2;
+        border-color: #fecaca;
+    }
+
+    .alert-title {
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 6px;
+    }
+
+    .alert-message {
+        color: #4b5563;
+        line-height: 1.6;
+        margin-bottom: 10px;
+    }
+
+    .alert-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .alert-count {
+        font-size: 13px;
+        font-weight: 700;
+        color: #374151;
+    }
+
+    .empty-state {
+        text-align: center;
+        color: #6b7280;
+        padding: 22px 10px;
+    }
+</style>
+
+<div class="admin-shell">
+    <div class="admin-hero">
+        <h2>Admin Dashboard</h2>
+        <p>Monitor users, academic content, submissions, enquiries, and audit activity from one place.</p>
+
+        <div class="hero-actions">
+            <a class="btn btn-light" href="@Url.Action("Index", "AdminUsers")">Manage Users</a>
+            <a class="btn btn-default" href="@Url.Action("Index", "AdminReports")">View Reports</a>
+            <a class="btn btn-default" href="@Url.Action("Index", "AdminCourses")">Manage Courses</a>
+            <a class="btn btn-default" href="@Url.Action("Index", "AdminEnquiries")">Manage Enquiries</a>
+            <a class="btn btn-default" href="@Url.Action("Index", "AdminAuditLogs")">Audit Logs</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="dashboard-card stats-card">
+                <div class="stats-number">@Model.TotalUsers</div>
+                <div class="stats-label">Total Users</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-card stats-card">
+                <div class="stats-number">@Model.TotalStudents</div>
+                <div class="stats-label">Students</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-card stats-card">
+                <div class="stats-number">@Model.TotalEducators</div>
+                <div class="stats-label">Educators</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-card stats-card">
+                <div class="stats-number">@Model.TotalAdmins</div>
+                <div class="stats-label">Admins</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="dashboard-card stats-card">
+                <div class="stats-number">@Model.TotalCourses</div>
+                <div class="stats-label">Courses</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-card stats-card">
+                <div class="stats-number">@Model.TotalLessons</div>
+                <div class="stats-label">Lessons</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-card stats-card">
+                <div class="stats-number">@Model.TotalExercises</div>
+                <div class="stats-label">Exercises</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-card stats-card">
+                <div class="stats-number">@Model.TotalEnrollments</div>
+                <div class="stats-label">Enrollments</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="dashboard-card stats-card">
+                <div class="stats-number">@Model.TotalSubmissions</div>
+                <div class="stats-label">Submissions</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="dashboard-card stats-card">
+                <div class="stats-number">@Model.PendingReviewCount</div>
+                <div class="stats-label">Pending Reviews</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="dashboard-card stats-card">
+                <div class="stats-number">@Model.TotalEnquiries</div>
+                <div class="stats-label">Total Enquiries</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="dashboard-card stats-card">
+                <div class="stats-number">@Model.UnreadEnquiriesCount</div>
+                <div class="stats-label">Unread Enquiries</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="dashboard-card stats-card">
+                <div class="stats-number">@Model.TotalAuditLogs</div>
+                <div class="stats-label">Audit Logs</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-card">
+        <h3 class="section-title">Quick Actions</h3>
+
+        @if (Model.QuickLinks == null || !Model.QuickLinks.Any())
+        {
+            <div class="empty-state">No quick actions available.</div>
+        }
+        else
+        {
+            <div class="row">
+                @foreach (var link in Model.QuickLinks)
+                {
+                    <div class="col-md-4 col-sm-6">
+                        <div class="quick-link-card @link.ThemeClass">
+                            <div class="quick-link-title">@link.Title</div>
+                            <div class="quick-link-desc">@link.Description</div>
+
+                            @if (!string.IsNullOrWhiteSpace(link.BadgeText))
+                            {
+                                <div class="quick-link-badge">@link.BadgeText</div>
+                            }
+
+                            <div>
+                                <a href="@link.ActionUrl" class="btn btn-primary">@link.ActionText</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="dashboard-card">
+        <h3 class="section-title">Operational Alerts</h3>
+
+        @if (Model.Alerts == null || !Model.Alerts.Any())
+        {
+            <div class="empty-state">No urgent operational alerts at the moment.</div>
+        }
+        else
+        {
+            <ul class="alert-list">
+                @foreach (var alert in Model.Alerts)
+                {
+                    var alertCss = "alert-info-box";
+
+                    if (alert.Severity == "warning")
+                    {
+                        alertCss = "alert-warning-box";
+                    }
+                    else if (alert.Severity == "danger")
+                    {
+                        alertCss = "alert-danger-box";
+                    }
+
+                    <li class="alert-item @alertCss">
+                        <div class="alert-title">@alert.Title</div>
+                        <div class="alert-message">@alert.Message</div>
+
+                        <div class="alert-meta">
+                            <span class="alert-count">@alert.CountText</span>
+
+                            @if (!string.IsNullOrWhiteSpace(alert.ActionUrl))
+                            {
+                                <a href="@alert.ActionUrl" class="btn btn-default btn-sm">@alert.ActionText</a>
+                            }
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+
+    <div class="dashboard-card">
+        <h3 class="section-title">Recent Enquiries</h3>
+
+        @if (Model.RecentEnquiries == null || !Model.RecentEnquiries.Any())
+        {
+            <div class="alert alert-info" style="margin-bottom:0;">No recent enquiries available.</div>
+        }
+        else
+        {
+            <table class="table table-striped recent-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Subject</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.RecentEnquiries)
+                    {
+                        <tr>
+                            <td>@item.FullName</td>
+                            <td>@item.Email</td>
+                            <td>@item.Role</td>
+                            <td>@item.Subject</td>
+                            <td>
+                                @if (item.IsRead)
+                                {
+                                    <span class="status-reviewed">Read</span>
+                                }
+                                else
+                                {
+                                    <span class="status-pending">Unread</span>
+                                }
+                            </td>
+                            <td>@item.SubmittedAtUtc.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <div class="dashboard-card">
+        <h3 class="section-title">Recent Audit Logs</h3>
+
+        @if (Model.RecentAuditLogs == null || !Model.RecentAuditLogs.Any())
+        {
+            <div class="alert alert-info" style="margin-bottom:0;">No audit log entries available.</div>
+        }
+        else
+        {
+            <table class="table table-striped recent-table">
+                <thead>
+                    <tr>
+                        <th>Admin</th>
+                        <th>Action</th>
+                        <th>Entity Type</th>
+                        <th>Entity</th>
+                        <th>Details</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.RecentAuditLogs)
+                    {
+                        <tr>
+                            <td>@item.AdminUserName</td>
+                            <td>@item.ActionType</td>
+                            <td>@item.EntityType</td>
+                            <td>@item.EntityDisplayName</td>
+                            <td>@item.Details</td>
+                            <td>@item.CreatedAtUtc.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <div class="dashboard-card">
+        <h3 class="section-title">Recent Submissions</h3>
+
+        @if (Model.RecentSubmissions == null || !Model.RecentSubmissions.Any())
+        {
+            <div class="alert alert-info" style="margin-bottom:0;">No recent submissions available.</div>
+        }
+        else
+        {
+            <table class="table table-striped recent-table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Course</th>
+                        <th>Lesson</th>
+                        <th>Score</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.RecentSubmissions)
+                    {
+                        <tr>
+                            <td>@item.StudentName</td>
+                            <td>@item.CourseTitle</td>
+                            <td>@item.LessonTitle</td>
+                            <td>@item.Percentage%</td>
+                            <td>
+                                @if (item.IsReviewed)
+                                {
+                                    <span class="status-reviewed">Reviewed</span>
+                                }
+                                else
+                                {
+                                    <span class="status-pending">Pending</span>
+                                }
+                            </td>
+                            <td>@item.SubmittedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

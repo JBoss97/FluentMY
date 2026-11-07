@@ -1,0 +1,611 @@
+﻿@model FluentMY.ViewModels.AdminReportsViewModel
+@using System.Globalization
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Admin Reports";
+
+    var reviewedQuizCount = Model.TotalQuizSubmissions - Model.PendingQuizReviewCount;
+    var reviewCompletionPercent = Model.TotalQuizSubmissions == 0
+        ? 0
+        : (int)System.Math.Round((reviewedQuizCount * 100.0) / Model.TotalQuizSubmissions);
+
+    var objectiveActivityCount = Model.TotalQuizSubmissions + Model.TotalGamePlaySessions;
+
+    var avgCoursePerformance = (Model.CoursePerformance != null && Model.CoursePerformance.Any())
+        ? Model.CoursePerformance.Average(x => x.OverallPerformanceScore)
+        : 0;
+
+    var avgLessonPerformance = (Model.LessonPerformance != null && Model.LessonPerformance.Any())
+        ? Model.LessonPerformance.Average(x => x.OverallPerformanceScore)
+        : 0;
+
+    Func<double, string> buildWidthStyle = value =>
+    {
+        var safeValue = value < 0 ? 0 : (value > 100 ? 100 : value);
+        return string.Format(CultureInfo.InvariantCulture, "width:{0:0.##}%;", safeValue);
+    };
+
+    var reviewCompletionStyle = buildWidthStyle(reviewCompletionPercent);
+    var avgCourseStyle = buildWidthStyle(avgCoursePerformance);
+    var avgLessonStyle = buildWidthStyle(avgLessonPerformance);
+}
+
+<style>
+    .report-shell {
+        color: #1f2937;
+    }
+
+    .report-hero {
+        border-radius: 24px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 30px;
+        margin-bottom: 24px;
+        box-shadow: 0 18px 36px rgba(13, 110, 253, 0.20);
+    }
+
+        .report-hero h2 {
+            margin: 0 0 8px;
+            font-weight: 900;
+        }
+
+        .report-hero p {
+            margin: 0;
+            color: rgba(255,255,255,0.88);
+        }
+
+    .report-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 20px;
+        margin-bottom: 20px;
+        height: 100%;
+    }
+
+    .report-number {
+        font-size: 30px;
+        font-weight: 900;
+        color: #0d6efd;
+        margin-bottom: 4px;
+    }
+
+    .report-label {
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .section-title {
+        font-weight: 900;
+        margin-top: 0;
+        margin-bottom: 14px;
+        color: #111827;
+    }
+
+    .section-subtitle {
+        color: #6b7280;
+        margin-bottom: 14px;
+        font-size: 13px;
+    }
+
+    .progress-track {
+        width: 100%;
+        height: 12px;
+        border-radius: 999px;
+        background: #e5e7eb;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+    }
+
+    .progress-fill-good {
+        background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+    }
+
+    .progress-fill-warn {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    .progress-fill-bad {
+        background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+    }
+
+    .mini-stat {
+        background: #f8fafc;
+        border-radius: 14px;
+        padding: 14px;
+        margin-bottom: 12px;
+    }
+
+    .mini-stat-value {
+        font-size: 22px;
+        font-weight: 800;
+        color: #111827;
+    }
+
+    .mini-stat-label {
+        font-size: 12px;
+        color: #6b7280;
+    }
+
+    .rank-item {
+        padding: 14px 0;
+        border-bottom: 1px solid #eef2f7;
+    }
+
+        .rank-item:last-child {
+            border-bottom: none;
+        }
+
+    .rank-title {
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+
+    .rank-meta {
+        color: #6b7280;
+        font-size: 13px;
+        margin-bottom: 8px;
+    }
+
+    .status-good,
+    .status-bad,
+    .status-reviewed,
+    .status-pending,
+    .status-speaking,
+    .status-quiz,
+    .status-gameplay {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .status-good,
+    .status-reviewed {
+        background: #ecfdf3;
+        color: #15803d;
+    }
+
+    .status-bad,
+    .status-pending {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .status-speaking {
+        background: #ecfeff;
+        color: #0f766e;
+    }
+
+    .status-quiz {
+        background: #eff6ff;
+        color: #0d6efd;
+    }
+
+    .status-gameplay {
+        background: #f5f3ff;
+        color: #7c3aed;
+    }
+
+    .report-table > thead > tr > th {
+        border-top: none !important;
+        font-weight: 700;
+        color: #374151;
+    }
+
+    .report-table > tbody > tr > td {
+        vertical-align: middle;
+    }
+
+    .muted-small {
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .score-pill {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #0d6efd;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .report-hero .btn {
+        border-radius: 12px;
+        font-weight: 700;
+        padding: 10px 16px;
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+
+    .activity-prompt {
+        color: #6b7280;
+        font-size: 12px;
+        margin-top: 4px;
+        line-height: 1.5;
+    }
+</style>
+
+<div class="report-shell">
+    <div class="report-hero">
+        <h2>Admin Reports & Analytics</h2>
+        <p>System monitoring, mixed lesson activity performance, quiz review workload, and learner activity overview.</p>
+        <div style="margin-top:14px;">
+            <a class="btn btn-light" href="@Url.Action("ExportCoursePerformanceCsv", "AdminReports")">Export Courses CSV</a>
+            <a class="btn btn-default" href="@Url.Action("ExportTopStudentsCsv", "AdminReports")">Export Top Students CSV</a>
+            <a class="btn btn-default" href="@Url.Action("ExportRecentSubmissionsCsv", "AdminReports")">Export Recent Activities CSV</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="report-card text-center">
+                <div class="report-number">@Model.TotalUsers</div>
+                <div class="report-label">Total Users</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="report-card text-center">
+                <div class="report-number">@Model.TotalStudents</div>
+                <div class="report-label">Students</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="report-card text-center">
+                <div class="report-number">@Model.TotalEducators</div>
+                <div class="report-label">Educators</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="report-card text-center">
+                <div class="report-number">@Model.PendingQuizReviewCount</div>
+                <div class="report-label">Pending Quiz Reviews</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="report-card text-center">
+                <div class="report-number">@Model.TotalCourses</div>
+                <div class="report-label">Courses</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="report-card text-center">
+                <div class="report-number">@Model.TotalLessons</div>
+                <div class="report-label">Lessons</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="report-card text-center">
+                <div class="report-number">@Model.TotalExercises</div>
+                <div class="report-label">Exercises</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="report-card text-center">
+                <div class="report-number">@Model.TotalLearningActivities</div>
+                <div class="report-label">Total Learning Activities</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="report-card text-center">
+                <div class="report-number">@Model.TotalQuizSubmissions</div>
+                <div class="report-label">Quiz Submissions</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="report-card text-center">
+                <div class="report-number">@Model.TotalGamePlaySessions</div>
+                <div class="report-label">Game Play Sessions</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="report-card text-center">
+                <div class="report-number">@Model.TotalSpeakingAttempts</div>
+                <div class="report-label">Speaking Attempts</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="report-card text-center">
+                <div class="report-number">@objectiveActivityCount</div>
+                <div class="report-label">Objective Activities</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="report-card">
+                <h3 class="section-title">Quiz Commented Completion</h3>
+                <p class="section-subtitle">How many quiz submissions have already been commented by educators.</p>
+
+                <div class="mini-stat">
+                    <div class="mini-stat-value">@reviewCompletionPercent%</div>
+                    <div class="mini-stat-label">Commented Quiz Completion Rate</div>
+                </div>
+
+                <div class="progress-track" style="margin-bottom:12px;">
+                    <div class="progress-fill" style="@reviewCompletionStyle"></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="mini-stat">
+                            <div class="mini-stat-value">@reviewedQuizCount</div>
+                            <div class="mini-stat-label">Commented Quiz Submissions</div>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="mini-stat">
+                            <div class="mini-stat-value">@Model.PendingQuizReviewCount</div>
+                            <div class="mini-stat-label">Pending Quiz Checks</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="report-card">
+                <h3 class="section-title">Learning Quality Snapshot</h3>
+                <p class="section-subtitle">Average performance across mixed lesson activities.</p>
+
+                <div class="mini-stat">
+                    <div class="mini-stat-value">@avgCoursePerformance.ToString("0.0")%</div>
+                    <div class="mini-stat-label">Average Course Performance</div>
+                </div>
+                <div class="progress-track" style="margin-bottom:16px;">
+                    <div class="@(avgCoursePerformance >= 80 ? "progress-fill progress-fill-good" : avgCoursePerformance >= 50 ? "progress-fill progress-fill-warn" : "progress-fill progress-fill-bad")"
+                         style="@avgCourseStyle"></div>
+                </div>
+
+                <div class="mini-stat">
+                    <div class="mini-stat-value">@avgLessonPerformance.ToString("0.0")%</div>
+                    <div class="mini-stat-label">Average Lesson Performance</div>
+                </div>
+                <div class="progress-track">
+                    <div class="@(avgLessonPerformance >= 80 ? "progress-fill progress-fill-good" : avgLessonPerformance >= 50 ? "progress-fill progress-fill-warn" : "progress-fill progress-fill-bad")"
+                         style="@avgLessonStyle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="report-card">
+                <h3 class="section-title">Course Performance Ranking</h3>
+                <p class="section-subtitle">Courses ranked by combined learning performance.</p>
+
+                @if (Model.CoursePerformance == null || !Model.CoursePerformance.Any())
+                {
+                    <div class="alert alert-info" style="margin-bottom:0;">No course performance data available.</div>
+                }
+                else
+                {
+                    foreach (var item in Model.CoursePerformance.OrderByDescending(x => x.OverallPerformanceScore).Take(8))
+                    {
+                        var widthStyle = buildWidthStyle(item.OverallPerformanceScore);
+
+                        <div class="rank-item">
+                            <div class="rank-title">@item.CourseTitle</div>
+                            <div class="rank-meta">
+                                @item.TotalLearningActivities activity record(s) •
+                                Objective: @item.QuizSubmissionCount •
+                                Speaking: @item.SpeakingAttemptCount •
+                                @item.EnrolledStudents enrolled •
+                                @item.CompletedStudents completed
+                            </div>
+                            <div class="progress-track">
+                                <div class="@(item.OverallPerformanceScore >= 80 ? "progress-fill progress-fill-good" : item.OverallPerformanceScore >= 50 ? "progress-fill progress-fill-warn" : "progress-fill progress-fill-bad")"
+                                     style="@widthStyle"></div>
+                            </div>
+                            <div class="muted-small" style="margin-top:6px;">
+                                Overall: @item.OverallPerformanceScore.ToString("0.0")%
+                                &nbsp;|&nbsp; Objective: @item.AverageQuizPercentage.ToString("0.0")%
+                                &nbsp;|&nbsp; Speaking: @item.AverageSpeakingOverallScore.ToString("0.0")%
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="report-card">
+                <h3 class="section-title">Lessons Needing Attention</h3>
+                <p class="section-subtitle">Lessons with weak mixed-activity performance should be reviewed first.</p>
+
+                @if (Model.LessonPerformance == null || !Model.LessonPerformance.Any())
+                {
+                    <div class="alert alert-info" style="margin-bottom:0;">No lesson performance data available.</div>
+                }
+                else
+                {
+                    var attentionLessons = Model.LessonPerformance
+                        .OrderBy(x => x.OverallPerformanceScore)
+                        .ThenByDescending(x => x.TotalLearningActivities)
+                        .Take(8)
+                        .ToList();
+
+                    foreach (var item in attentionLessons)
+                    {
+                        var widthStyle = buildWidthStyle(item.OverallPerformanceScore);
+
+                        <div class="rank-item">
+                            <div class="rank-title">@item.LessonTitle</div>
+                            <div class="rank-meta">
+                                @item.CourseTitle •
+                                @item.TotalLearningActivities activity record(s) •
+                                Objective: @item.QuizSubmissionCount •
+                                Speaking: @item.SpeakingAttemptCount
+                                @if (item.HasSpeakingActivity)
+                                {
+                                    <text> • Includes Speaking</text>
+                                }
+                            </div>
+                            <div class="progress-track">
+                                <div class="@(item.OverallPerformanceScore >= 80 ? "progress-fill progress-fill-good" : item.OverallPerformanceScore >= 50 ? "progress-fill progress-fill-warn" : "progress-fill progress-fill-bad")"
+                                     style="@widthStyle"></div>
+                            </div>
+                            <div style="margin-top:6px;">
+                                @if (item.NeedsAttention)
+                                {
+                                    <span class="status-bad">Needs Attention</span>
+                                }
+                                else
+                                {
+                                    <span class="status-good">Healthy</span>
+                                }
+                                <span class="muted-small" style="margin-left:8px;">
+                                    Overall: @item.OverallPerformanceScore.ToString("0.0")%
+                                </span>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="report-card">
+        <h3 class="section-title">Recent Learning Activities</h3>
+
+        @if (Model.RecentActivities == null || !Model.RecentActivities.Any())
+        {
+            <div class="alert alert-info" style="margin-bottom:0;">No recent learning activities available.</div>
+        }
+        else
+        {
+            <table class="table table-striped report-table">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Student</th>
+                        <th>Course</th>
+                        <th>Lesson</th>
+                        <th>Result</th>
+                        <th>Status</th>
+                        <th>Attempted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.RecentActivities.OrderByDescending(x => x.AttemptedAt))
+                    {
+                        <tr>
+                            <td>
+                                @if (item.ActivityType == "Speaking")
+                                {
+                                    <span class="status-speaking">Speaking</span>
+                                }
+                                else if (item.ActivityType == "Game Play")
+                                {
+                                    <span class="status-gameplay">Game Play</span>
+                                }
+                                else
+                                {
+                                    <span class="status-quiz">Quiz</span>
+                                }
+                            </td>
+                            <td>@item.StudentName</td>
+                            <td>@item.CourseTitle</td>
+                            <td>
+                                <div>@item.LessonTitle</div>
+                                @if (!string.IsNullOrWhiteSpace(item.PromptText))
+                                {
+                                    <div class="activity-prompt">@item.PromptText</div>
+                                }
+                            </td>
+                            <td>
+                                @if (item.ActivityType == "Speaking")
+                                {
+                                    <span class="score-pill">Overall @((item.SpeakingOverallScore ?? 0).ToString())</span>
+                                }
+                                else
+                                {
+                                    <span class="score-pill">@((item.Percentage ?? 0).ToString())%</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.ActivityType == "Quiz")
+                                {
+                                    if (item.IsReviewed == true)
+                                    {
+                                        <span class="status-reviewed">Reviewed</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-pending">Pending</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="status-good">Completed</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="muted-small">@item.AttemptedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <div class="report-card">
+        <h3 class="section-title">Top Students</h3>
+
+        @if (Model.TopStudents == null || !Model.TopStudents.Any())
+        {
+            <div class="alert alert-info" style="margin-bottom:0;">No student performance data available.</div>
+        }
+        else
+        {
+            <table class="table table-striped report-table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Objective</th>
+                        <th>Speaking</th>
+                        <th>Total Activities</th>
+                        <th>Objective Avg</th>
+                        <th>Speaking Avg</th>
+                        <th>Overall</th>
+                        <th>Completed Courses</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.TopStudents.OrderByDescending(x => x.OverallPerformanceScore).ThenByDescending(x => x.TotalLearningActivities))
+                    {
+                        <tr>
+                            <td>@item.StudentName</td>
+                            <td>@item.QuizSubmissionCount</td>
+                            <td>@item.SpeakingAttemptCount</td>
+                            <td>@item.TotalLearningActivities</td>
+                            <td><span class="score-pill">@item.AverageQuizPercentage.ToString("0.0")%</span></td>
+                            <td><span class="score-pill">@item.AverageSpeakingOverallScore.ToString("0.0")%</span></td>
+                            <td><span class="score-pill">@item.OverallPerformanceScore.ToString("0.0")%</span></td>
+                            <td>@item.CompletedCourses</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

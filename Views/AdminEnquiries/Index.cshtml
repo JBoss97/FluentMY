@@ -1,0 +1,46 @@
+﻿@model IEnumerable<FluentMY.Models.ContactEnquiry>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Admin Enquiries";
+}
+
+<h2>Admin Enquiries</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Submitted</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.FullName</td>
+                <td>@item.Email</td>
+                <td>@item.Role</td>
+                <td>@item.Subject</td>
+                <td>
+                    @if (item.IsRead)
+                    {
+                        <span class="label label-success">Read</span>
+                    }
+                    else
+                    {
+                        <span class="label label-warning">New</span>
+                    }
+                </td>
+                <td>@item.SubmittedAtUtc.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+                <td>
+                    <a class="btn btn-sm btn-primary" href="@Url.Action("Details", new { id = item.ContactEnquiryId })">Open</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,391 @@
+﻿@model IEnumerable<FluentMY.Models.Exercise>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Manage Exercises";
+}
+
+@functions {
+    public string GetExerciseTitle(FluentMY.Models.Exercise item)
+    {
+        if (!string.IsNullOrWhiteSpace(item.PromptText))
+        {
+            return item.PromptText;
+        }
+
+        if (!string.IsNullOrWhiteSpace(item.QuestionText))
+        {
+            return item.QuestionText;
+        }
+
+        return "Untitled Exercise";
+    }
+
+    public string GetExerciseTypeLabel(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return "Multiple Choice";
+
+        switch (value.Trim().ToLowerInvariant())
+        {
+            case "multiplechoice": return "Multiple Choice";
+            case "multipleselect": return "Multiple Select";
+            case "fillblank": return "Fill Blank";
+            case "matching": return "Matching";
+            case "reorder": return "Reorder";
+            case "listeningchoice": return "Listening + Choice";
+            case "speaking": return "Speaking";
+            default: return value;
+        }
+    }
+
+    public string GetAnswerPreview(FluentMY.Models.Exercise item)
+    {
+        var type = (item.ExerciseType ?? "").Trim().ToLowerInvariant();
+
+        if (type == "multiplechoice" || type == "listeningchoice" || type == "multipleselect")
+        {
+            return string.IsNullOrWhiteSpace(item.CorrectAnswer) ? "-" : item.CorrectAnswer;
+        }
+
+        if (type == "fillblank")
+        {
+            return string.IsNullOrWhiteSpace(item.CorrectAnswer) ? "-" : item.CorrectAnswer;
+        }
+
+        if (type == "matching")
+        {
+            return string.IsNullOrWhiteSpace(item.MatchingPairsJson) ? "-" : "Matching Set";
+        }
+
+        if (type == "reorder")
+        {
+            return string.IsNullOrWhiteSpace(item.SentenceTokensJson) ? "-" : "Sentence Order";
+        }
+
+        if (type == "speaking")
+        {
+            return string.IsNullOrWhiteSpace(item.ReferenceText) ? "-" : "Speaking Prompt";
+        }
+
+        return "-";
+    }
+}
+
+<style>
+    .exercise-shell {
+        color: #1f2937;
+    }
+
+    .exercise-hero {
+        border-radius: 22px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 28px;
+        margin-bottom: 24px;
+        box-shadow: 0 16px 35px rgba(13, 110, 253, 0.20);
+    }
+
+        .exercise-hero h2 {
+            margin: 0 0 8px;
+            font-weight: 800;
+        }
+
+        .exercise-hero p {
+            margin: 0;
+            color: rgba(255,255,255,0.88);
+            max-width: 760px;
+        }
+
+    .exercise-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+
+        .exercise-toolbar .btn {
+            border-radius: 12px;
+            font-weight: 600;
+            padding: 10px 16px;
+        }
+
+    .exercise-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 22px;
+    }
+
+    .exercise-table {
+        margin-bottom: 0;
+    }
+
+        .exercise-table > thead > tr > th {
+            border-top: none !important;
+            color: #374151;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+
+        .exercise-table > tbody > tr > td {
+            vertical-align: top;
+        }
+
+    .exercise-title {
+        font-weight: 700;
+        color: #111827;
+        max-width: 460px;
+        line-height: 1.6;
+        margin-bottom: 8px;
+    }
+
+    .exercise-sub {
+        color: #6b7280;
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    .mini-pill,
+    .type-pill,
+    .area-pill,
+    .status-pill,
+    .answer-pill,
+    .marks-pill,
+    .xp-pill,
+    .order-pill {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-right: 6px;
+        margin-bottom: 6px;
+    }
+
+    .type-pill {
+        background: #eff6ff;
+        color: #0d6efd;
+    }
+
+    .area-pill {
+        background: #ecfdf3;
+        color: #15803d;
+    }
+
+    .status-pill.yes {
+        background: #eef2ff;
+        color: #4338ca;
+    }
+
+    .status-pill.no {
+        background: #f3f4f6;
+        color: #4b5563;
+    }
+
+    .answer-pill {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .marks-pill {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .xp-pill {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .order-pill {
+        background: #f3e8ff;
+        color: #7c3aed;
+    }
+
+    .meta-stack {
+        min-width: 170px;
+    }
+
+    .action-group .btn {
+        margin-right: 6px;
+        margin-bottom: 6px;
+        border-radius: 10px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 36px 20px;
+        border: 1px dashed rgba(15, 23, 42, 0.12);
+        border-radius: 16px;
+        background: #fff;
+    }
+
+        .empty-state h4 {
+            font-weight: 800;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: #6b7280;
+            margin-bottom: 16px;
+        }
+
+    .context-note {
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    @@media (max-width: 991px) {
+        .exercise-hero {
+            padding: 22px;
+        }
+    }
+</style>
+
+<div class="exercise-shell">
+    <div class="exercise-hero">
+        <h2>Manage Exercises</h2>
+        <p>
+            <strong>Course:</strong> @ViewBag.CourseTitle &nbsp;•&nbsp;
+            <strong>Lesson:</strong> @ViewBag.LessonTitle
+        </p>
+    </div>
+
+    @if (TempData["ExerciseMessage"] != null)
+    {
+        <div class="alert alert-info">@TempData["ExerciseMessage"]</div>
+    }
+
+    <div class="exercise-toolbar">
+        <div>
+            <span class="context-note">Exercises are sorted by display order, then most recently updated.</span>
+        </div>
+        <div>
+            <a class="btn btn-primary" href="@Url.Action("Create", "EducatorExercises", new { lessonId = ViewBag.LessonId })">
+                Add Exercise
+            </a>
+            <a class="btn btn-default" href="@Url.Action("Index", "EducatorLessons", new { courseId = ViewBag.CourseId })">
+                Back to Lessons
+            </a>
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="empty-state">
+                <h4>No exercises yet</h4>
+                <p>
+                    Add the first exercise for this lesson to start building the assessment and game flow.
+                </p>
+                <a class="btn btn-primary" href="@Url.Action("Create", "EducatorExercises", new { lessonId = ViewBag.LessonId })">
+                    Add Exercise
+                </a>
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped exercise-table">
+                <thead>
+                    <tr>
+                        <th style="width:50px;">#</th>
+                        <th>Exercise</th>
+                        <th style="width:170px;">Answer / Data</th>
+                        <th style="width:170px;">Settings</th>
+                        <th style="width:180px;">Updated</th>
+                        <th style="width:180px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int no = 1;
+                    }
+
+                    @foreach (var item in Model)
+                    {
+                        var title = GetExerciseTitle(item);
+                        var typeLabel = GetExerciseTypeLabel(item.ExerciseType);
+                        var answerPreview = GetAnswerPreview(item);
+                        var hasAudio = !string.IsNullOrWhiteSpace(item.AudioPromptPath);
+
+                        <tr>
+                            <td>@no</td>
+
+                            <td>
+                                <div class="exercise-title">@title</div>
+
+                                <div class="exercise-sub">Exercise ID: @item.ExerciseId</div>
+
+                                <div>
+                                    <span class="type-pill">@typeLabel</span>
+                                    <span class="area-pill">@(string.IsNullOrWhiteSpace(item.PracticeArea) ? "General" : item.PracticeArea)</span>
+
+                                    @if (hasAudio)
+                                    {
+                                        <span class="status-pill yes">Audio Uploaded</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-pill no">No Audio</span>
+                                    }
+
+                                    @if (item.AllowRetry)
+                                    {
+                                        <span class="status-pill yes">Retry Allowed</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-pill no">Retry Off</span>
+                                    }
+                                </div>
+                            </td>
+
+                            <td>
+                                <div>
+                                    <span class="answer-pill">@answerPreview</span>
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(item.ReferenceText))
+                                {
+                                    <div class="exercise-sub" style="margin-top:6px;">
+                                        Speaking Text: @item.ReferenceText
+                                    </div>
+                                }
+                            </td>
+
+                            <td class="meta-stack">
+                                <div>
+                                    <span class="marks-pill">Marks: @item.Marks</span>
+                                </div>
+                                <div>
+                                    <span class="xp-pill">XP: @item.XPReward</span>
+                                </div>
+                                <div>
+                                    <span class="order-pill">Order: @item.DisplayOrder</span>
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="exercise-sub">
+                                    @((item.UpdatedAt ?? item.CreatedAt).ToLocalTime().ToString("dd MMM yyyy HH:mm"))
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="action-group">
+                                    <a class="btn btn-xs btn-primary" href="@Url.Action("Edit", new { id = item.ExerciseId })">Edit</a>
+                                    <a class="btn btn-xs btn-danger" href="@Url.Action("Delete", new { id = item.ExerciseId })">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+
+                        no++;
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

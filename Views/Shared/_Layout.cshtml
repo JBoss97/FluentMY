@@ -1,0 +1,156 @@
+﻿@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+
+    Func<string, string, string> navClass = (controller, action) =>
+    {
+        var isActive = string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase)
+                       && (string.IsNullOrEmpty(action) || string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase));
+
+        return isActive ? "nav-link nav-link-custom active" : "nav-link nav-link-custom";
+    };
+
+    var brandUrl = Url.Action("Index", "Home");
+
+    if (Request.IsAuthenticated)
+    {
+        if (User.IsInRole("Admin"))
+        {
+            brandUrl = Url.Action("Index", "Admin");
+        }
+        else if (User.IsInRole("Educator"))
+        {
+            brandUrl = Url.Action("Index", "Educator");
+        }
+        else
+        {
+            brandUrl = Url.Action("Index", "Student");
+        }
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - FluentMY</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark fm-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="@brandUrl">
+                <img src="@Url.Content("~/Content/images/fluentmy-logo.png")" alt="FluentMY" />
+            </a>
+
+            <button type="button"
+                    class="navbar-toggler"
+                    data-bs-toggle="collapse"
+                    data-bs-target=".navbar-collapse"
+                    title="Toggle navigation"
+                    aria-controls="navbarSupportedContent"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    @if (!Request.IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = navClass("Home", "Index") })
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                @Html.ActionLink("Dashboard", "Index", "Admin", null, new { @class = navClass("Admin", "Index") })
+                            }
+                            else if (User.IsInRole("Educator"))
+                            {
+                                @Html.ActionLink("Dashboard", "Index", "Educator", null, new { @class = navClass("Educator", "Index") })
+                            }
+                            else
+                            {
+                                @Html.ActionLink("Dashboard", "Index", "Student", null, new { @class = navClass("Student", "Index") })
+                            }
+                        </li>
+                    }
+
+                    <li class="nav-item">
+                        @Html.ActionLink("Courses", "Index", "Courses", null, new { @class = navClass("Courses", "Index") })
+                    </li>
+
+                    @if (Request.IsAuthenticated && User.IsInRole("Student"))
+                    {
+                        <li class="nav-item">
+                            @Html.ActionLink("Learning History", "History", "StudentSubmissions", null, new { @class = navClass("StudentSubmissions", "History") })
+                        </li>
+                    }
+
+                    @if (Request.IsAuthenticated && User.IsInRole("Educator"))
+                    {
+                        <li class="nav-item">
+                            @Html.ActionLink("Manage Courses", "Index", "EducatorCourses", null, new { @class = navClass("EducatorCourses", "Index") })
+                        </li>
+                        <li class="nav-item">
+                            @Html.ActionLink("Manage Lessons", "Index", "EducatorLessons", null, new { @class = navClass("EducatorLessons", "Index") })
+                        </li>
+                    }
+
+                    @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item">
+                            @Html.ActionLink("Manage Users", "Index", "AdminUsers", null, new { @class = navClass("AdminUsers", "Index") })
+                        </li>
+                        <li class="nav-item">
+                            @Html.ActionLink("Reports", "Index", "AdminReports", null, new { @class = navClass("AdminReports", "Index") })
+                        </li>
+                        <li class="nav-item">
+                            @Html.ActionLink("Enquiries", "Index", "AdminEnquiries", null, new { @class = navClass("AdminEnquiries", "Index") })
+                        </li>
+                        <li class="nav-item">
+                            @Html.ActionLink("Audit Logs", "Index", "AdminAuditLogs", null, new { @class = navClass("AdminAuditLogs", "Index") })
+                        </li>
+                    }
+
+                    @if (!Request.IsAuthenticated || !User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item">
+                            @Html.ActionLink("About", "About", "Home", new { area = "" }, new { @class = navClass("Home", "About") })
+                        </li>
+
+                        <li class="nav-item">
+                            @Html.ActionLink("Contact", "Contact", "Home", new { area = "" }, new { @class = navClass("Home", "Contact") })
+                        </li>
+                    }
+                </ul>
+
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </nav>
+
+    <main class="container body-wrap">
+        <div class="content-shell">
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="fm-footer">
+        <div class="container">
+            <div class="fm-footer-inner">
+                &copy; @DateTime.Now.Year - FluentMY Language Learning Platform
+            </div>
+        </div>
+    </footer>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

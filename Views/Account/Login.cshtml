@@ -1,0 +1,283 @@
+﻿@using FluentMY.Models
+@model LoginViewModel
+@{
+    ViewBag.Title = "Log in";
+}
+
+<style>
+    .auth-shell {
+        max-width: 980px;
+        margin: 36px auto 56px;
+        padding: 0 16px;
+    }
+
+    .auth-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        background: #fff;
+        border: 1px solid rgba(15, 23, 42, 0.06);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    .auth-side {
+        flex: 1 1 42%;
+        min-height: 560px;
+        padding: 42px 34px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+        .auth-side h1 {
+            margin: 0 0 14px;
+            font-size: 38px;
+            font-weight: 800;
+            line-height: 1.15;
+        }
+
+        .auth-side p {
+            margin: 0 0 14px;
+            font-size: 15px;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.90);
+        }
+
+    .auth-points {
+        margin: 14px 0 0;
+        padding-left: 18px;
+    }
+
+        .auth-points li {
+            margin-bottom: 8px;
+            color: rgba(255,255,255,0.92);
+        }
+
+    .auth-form-panel {
+        flex: 1 1 58%;
+        padding: 42px 38px;
+        background: #fff;
+    }
+
+    .auth-header h2 {
+        margin: 0 0 8px;
+        font-size: 30px;
+        font-weight: 800;
+        color: #111827;
+    }
+
+    .auth-header p {
+        margin: 0 0 24px;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .form-card {
+        background: #fff;
+        border: 1px solid #eef2f7;
+        border-radius: 18px;
+        padding: 24px;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: #374151;
+        }
+
+    .form-control {
+        border-radius: 12px;
+        min-height: 46px;
+        border: 1px solid #d1d5db;
+        box-shadow: none;
+    }
+
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 3px rgba(13,110,253,0.10);
+        }
+
+    .remember-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: -4px;
+    }
+
+        .remember-row input[type="checkbox"] {
+            margin: 0;
+        }
+
+    .auth-actions {
+        margin-top: 6px;
+    }
+
+    .btn-login {
+        border-radius: 12px;
+        padding: 11px 18px;
+        font-weight: 700;
+        min-width: 140px;
+    }
+
+    .auth-links {
+        margin-top: 18px;
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+        .auth-links a {
+            color: #0d6efd;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+    .external-wrap {
+        margin-top: 22px;
+        padding-top: 18px;
+        border-top: 1px solid #eef2f7;
+    }
+
+        .external-wrap h4 {
+            margin: 0 0 8px;
+            font-size: 16px;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .external-wrap p {
+            margin: 0 0 14px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+    .validation-summary-errors {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #b91c1c;
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-bottom: 18px;
+    }
+
+        .validation-summary-errors ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+    .text-danger {
+        display: block;
+        margin-top: 6px;
+        font-size: 13px;
+    }
+
+    @@media (max-width: 991px) {
+        .auth-side,
+        .auth-form-panel {
+            flex: 1 1 100%;
+            min-height: auto;
+        }
+
+        .auth-side {
+            padding: 32px 24px;
+        }
+
+        .auth-form-panel {
+            padding: 32px 24px;
+        }
+
+        .auth-side h1 {
+            font-size: 32px;
+        }
+    }
+</style>
+
+<div class="auth-shell">
+    <div class="auth-wrap">
+        <div class="auth-side">
+            <h1>Welcome back</h1>
+            <p>
+                Sign in to continue your learning journey, review progress,
+                and access your FluentMY dashboard.
+            </p>
+            <ul class="auth-points">
+                <li>Continue from your latest lesson</li>
+                <li>Check quiz results and submissions</li>
+                <li>Manage courses and lessons as an educator</li>
+            </ul>
+        </div>
+
+        <div class="auth-form-panel">
+            <div class="auth-header">
+                <h2>Log In</h2>
+                <p>Enter your account details below.</p>
+            </div>
+
+            <div class="form-card">
+                @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+                {
+                @Html.AntiForgeryToken()
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Email)
+                    @Html.TextBoxFor(m => m.Email, new
+                    {
+                        @class = "form-control",
+                        placeholder = "Email address"
+                    })
+                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Password)
+                    @Html.PasswordFor(m => m.Password, new
+                    {
+                        @class = "form-control",
+                        placeholder = "Password"
+                    })
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    <div class="remember-row">
+                        @Html.CheckBoxFor(m => m.RememberMe)
+                        @Html.LabelFor(m => m.RememberMe)
+                    </div>
+                </div>
+
+                <div class="auth-actions">
+                    <button type="submit" class="btn btn-primary btn-login">Log In</button>
+                </div>
+
+                <div class="auth-links">
+                    Don’t have an account?
+                    @Html.ActionLink("Register here", "Register", "Account")
+                </div>
+                
+                <div class="auth-links">
+                    @Html.ActionLink("Forgot your password?", "ForgotPassword", "Account")
+                </div>
+                }
+
+                <div class="external-wrap">
+                    <h4>External Sign-In</h4>
+                    <p>Use another sign-in method if it is available for your account.</p>
+                    @Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { ReturnUrl = ViewBag.ReturnUrl })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

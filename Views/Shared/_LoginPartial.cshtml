@@ -1,0 +1,180 @@
+﻿@using Microsoft.AspNet.Identity
+@using Microsoft.AspNet.Identity.Owin
+@using FluentMY.Models
+@using FluentMY
+
+@{
+    ApplicationUser currentUser = null;
+    string displayName = "User";
+    string roleName = "Member";
+    string imagePath = null;
+    string initial = "U";
+
+    if (Request.IsAuthenticated)
+    {
+        var userManager = Context.GetOwinContext().GetUserManager<ApplicationUserManager>();
+        currentUser = userManager.FindById(User.Identity.GetUserId());
+
+        if (currentUser != null)
+        {
+            displayName = !string.IsNullOrWhiteSpace(currentUser.FullName)
+                ? currentUser.FullName
+                : (!string.IsNullOrWhiteSpace(currentUser.UserName)
+                    ? currentUser.UserName
+                    : User.Identity.GetUserName());
+
+            imagePath = currentUser.ProfileImagePath;
+
+            if (!string.IsNullOrWhiteSpace(displayName))
+            {
+                initial = displayName.Substring(0, 1).ToUpper();
+            }
+
+            if (User.IsInRole("Admin"))
+            {
+                roleName = "Admin";
+            }
+            else if (User.IsInRole("Educator"))
+            {
+                roleName = "Educator";
+            }
+            else if (User.IsInRole("Student"))
+            {
+                roleName = "Student";
+            }
+        }
+    }
+}
+
+<style>
+    .account-nav,
+    .account-guest {
+        align-items: center;
+    }
+
+        .account-nav > li > a,
+        .account-guest > li > a {
+            color: rgba(255,255,255,0.9) !important;
+            text-decoration: none !important;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+            .account-nav > li > a:hover,
+            .account-guest > li > a:hover {
+                color: #fff !important;
+                background: rgba(255,255,255,0.10);
+            }
+
+    .account-link {
+        display: flex !important;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px !important;
+        min-height: 50px;
+    }
+
+    .account-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(255,255,255,0.22);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    }
+
+    .account-avatar-fallback {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ffffff, #dbeafe);
+        color: #0b5ed7;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid rgba(255,255,255,0.22);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+        font-size: 14px;
+    }
+
+    .account-text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+    }
+
+    .account-name {
+        font-weight: 600;
+        color: #fff;
+        max-width: 170px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .account-role {
+        font-size: 11px;
+        color: rgba(255,255,255,0.78);
+        letter-spacing: 0.2px;
+    }
+
+    .logout-link,
+    .guest-link {
+        padding: 10px 14px !important;
+        font-weight: 500;
+    }
+
+    .guest-link-primary {
+        background: linear-gradient(135deg, rgba(13,110,253,0.95), rgba(11,77,183,0.95));
+        color: #fff !important;
+        box-shadow: 0 6px 16px rgba(13, 110, 253, 0.22);
+    }
+
+        .guest-link-primary:hover {
+            background: linear-gradient(135deg, rgba(13,110,253,1), rgba(11,77,183,1)) !important;
+            color: #fff !important;
+        }
+</style>
+
+@if (Request.IsAuthenticated)
+{
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <ul class="nav navbar-nav navbar-right account-nav">
+            <li>
+                <a href="@Url.Action("EditProfile", "Manage")" class="account-link" title="Manage Profile">
+                    @if (!string.IsNullOrEmpty(imagePath))
+                    {
+                        <img src="@Url.Content(imagePath)" alt="Profile" class="account-avatar" />
+                    }
+                    else
+                    {
+                        <span class="account-avatar-fallback">@initial</span>
+                    }
+
+                    <span class="account-text">
+                        <span class="account-name">@displayName</span>
+                        <span class="account-role">@roleName</span>
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a class="logout-link" href="javascript:document.getElementById('logoutForm').submit()">Log off</a>
+            </li>
+        </ul>
+    }
+}
+else
+{
+    <ul class="nav navbar-nav navbar-right account-guest">
+        <li>
+            @Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink", @class = "guest-link guest-link-primary" })
+        </li>
+        <li>
+            @Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink", @class = "guest-link" })
+        </li>
+    </ul>
+}

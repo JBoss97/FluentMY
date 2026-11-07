@@ -1,0 +1,106 @@
+﻿@model FluentMY.ViewModels.AdminEditUserViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Edit User";
+}
+
+<style>
+    .edit-shell {
+        color: #1f2937;
+    }
+
+    .edit-hero {
+        border-radius: 24px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 30px;
+        margin-bottom: 24px;
+        box-shadow: 0 18px 36px rgba(13, 110, 253, 0.20);
+    }
+
+        .edit-hero h2 {
+            margin: 0 0 8px;
+            font-weight: 900;
+        }
+
+    .edit-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 24px;
+    }
+
+        .edit-card .form-group {
+            margin-bottom: 18px;
+        }
+
+        .edit-card .form-control {
+            border-radius: 12px;
+            min-height: 44px;
+        }
+</style>
+
+<div class="edit-shell">
+    <div class="edit-hero">
+        <h2>Edit User</h2>
+        <p>Update account details, role, and email confirmation status.</p>
+    </div>
+
+    <div class="edit-card">
+        @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.UserId)
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.FullName)
+                @Html.TextBoxFor(m => m.FullName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.UserName)
+                @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Email)
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.SelectedRole)
+
+                @if (Model.IsSelf)
+                {
+                    <input type="text" class="form-control" value="@Model.CurrentRoleName" readonly="readonly" />
+                    @Html.HiddenFor(m => m.SelectedRole)
+                    <span class="help-block">You cannot change your own role from Admin User Management.</span>
+                }
+                else
+                {
+                    @Html.DropDownListFor(m => m.SelectedRole, Model.AvailableRoles, "-- Select Role --", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.SelectedRole, "", new { @class = "text-danger" })
+                }
+            </div>
+
+            <div class="checkbox">
+                <label>
+                    @Html.CheckBoxFor(m => m.EmailConfirmed) Email Confirmed
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            if (!Model.IsSelf)
+            {
+                <a class="btn btn-info" href="@Url.Action("ResetPassword", new { id = Model.UserId })">Reset Password</a>
+            }
+            <a class="btn btn-default" href="@Url.Action("Index")">Back</a>
+        }
+    </div>
+</div>

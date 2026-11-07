@@ -1,0 +1,98 @@
+﻿@model FluentMY.ViewModels.EducatorCourseViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Delete Course";
+}
+
+<style>
+    .course-delete-shell {
+        color: #1f2937;
+    }
+
+    .course-delete-hero {
+        border-radius: 22px;
+        background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);
+        color: #fff;
+        padding: 28px;
+        margin-bottom: 24px;
+        box-shadow: 0 16px 35px rgba(220, 53, 69, 0.20);
+    }
+
+        .course-delete-hero h2 {
+            margin: 0 0 8px;
+            font-weight: 800;
+        }
+
+        .course-delete-hero p {
+            margin: 0;
+            color: rgba(255,255,255,0.88);
+        }
+
+    .course-delete-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 24px;
+    }
+
+    .delete-meta {
+        margin-bottom: 8px;
+        color: #374151;
+    }
+
+    .delete-warning-note {
+        color: #6b7280;
+        margin-top: 12px;
+        margin-bottom: 18px;
+    }
+
+    .course-delete-actions .btn {
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-weight: 600;
+        margin-right: 8px;
+    }
+</style>
+
+<div class="course-delete-shell">
+    <div class="course-delete-hero">
+        <h2>Delete Course</h2>
+        <p>This action will permanently remove the selected course if it has no lessons or enrollments.</p>
+    </div>
+
+    <div class="course-delete-card">
+        <div class="alert alert-warning">
+            Are you sure you want to delete this course?
+        </div>
+
+        <div class="panel panel-default" style="margin-bottom:20px;">
+            <div class="panel-body">
+                <div class="delete-meta"><strong>Title:</strong> @Model.Title</div>
+                <div class="delete-meta"><strong>Language:</strong> @(string.IsNullOrWhiteSpace(Model.Language) ? "-" : Model.Language)</div>
+                <div class="delete-meta"><strong>Level:</strong> @(string.IsNullOrWhiteSpace(Model.Level) ? "-" : Model.Level)</div>
+                <div class="delete-meta"><strong>Duration:</strong> @(string.IsNullOrWhiteSpace(Model.EstimatedDuration) ? "-" : Model.EstimatedDuration)</div>
+                <div class="delete-meta"><strong>Lessons:</strong> @Model.LessonCount</div>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Description))
+                {
+                    <hr />
+                    <div class="delete-meta"><strong>Description:</strong> @Model.Description</div>
+                }
+            </div>
+        </div>
+
+        <div class="delete-warning-note">
+            A course cannot be deleted if it still contains lessons or if students are already enrolled in it.
+        </div>
+
+        @using (Html.BeginForm("Delete", "EducatorCourses", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.CourseId)
+
+            <button class="btn btn-danger" type="submit">Delete Course</button>
+            <a class="btn btn-default" href="@Url.Action("Index")">Cancel</a>
+        }
+    </div>
+</div>

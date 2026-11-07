@@ -1,0 +1,200 @@
+﻿@model IEnumerable<FluentMY.Models.Lesson>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Manage Lessons";
+    var selectedCourseId = ViewBag.SelectedCourseId;
+}
+
+<style>
+    .lessons-shell {
+        color: #1f2937;
+    }
+
+    .lessons-hero {
+        border-radius: 22px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 28px;
+        margin-bottom: 24px;
+        box-shadow: 0 16px 35px rgba(13, 110, 253, 0.20);
+    }
+
+        .lessons-hero h2 {
+            margin: 0 0 8px;
+            font-weight: 800;
+        }
+
+        .lessons-hero p {
+            margin: 0;
+            color: rgba(255,255,255,0.88);
+            max-width: 760px;
+        }
+
+    .lessons-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+
+        .lessons-toolbar .btn {
+            border-radius: 12px;
+            font-weight: 600;
+            padding: 10px 16px;
+        }
+
+    .lessons-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15, 23, 42, 0.06);
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+        padding: 22px;
+    }
+
+    .lessons-table {
+        margin-bottom: 0;
+    }
+
+        .lessons-table > thead > tr > th {
+            border-top: none !important;
+            color: #374151;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+
+        .lessons-table > tbody > tr > td {
+            vertical-align: middle;
+        }
+
+    .lesson-title {
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .lesson-meta {
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .action-group .btn {
+        margin-right: 6px;
+        margin-bottom: 6px;
+        border-radius: 10px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 36px 20px;
+        border: 1px dashed rgba(15, 23, 42, 0.12);
+        border-radius: 16px;
+        background: #fff;
+    }
+
+        .empty-state h4 {
+            font-weight: 800;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: #6b7280;
+            margin-bottom: 16px;
+        }
+
+    .filter-note {
+        margin-bottom: 12px;
+        color: #6b7280;
+    }
+
+    @@media (max-width: 991px) {
+        .lessons-hero {
+            padding: 22px;
+        }
+    }
+</style>
+
+<div class="lessons-shell">
+    <div class="lessons-hero">
+        <h2>Manage Lessons</h2>
+        <p>
+            Create, update, preview, and review the lessons inside your educator-owned courses.
+        </p>
+    </div>
+
+    @if (TempData["EducatorLessonMessage"] != null)
+    {
+        <div class="alert alert-info">@TempData["EducatorLessonMessage"]</div>
+    }
+
+    <div class="lessons-toolbar">
+        <div>
+            @if (selectedCourseId != null)
+            {
+                <span class="lesson-meta">Lessons are sorted by most recently updated</span>
+            }
+        </div>
+
+        <div>
+            <a class="btn btn-primary" href="@Url.Action("Create", new { courseId = selectedCourseId })">Create Lesson</a>
+            <a class="btn btn-default" href="@Url.Action("Index", "EducatorCourses")">Manage Courses</a>
+        </div>
+    </div>
+
+    <div class="lessons-card">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="empty-state">
+                <h4>No lessons found</h4>
+                <p>
+                    Start by creating a lesson under one of your educator-owned courses.
+                </p>
+                <a class="btn btn-primary" href="@Url.Action("Create", new { courseId = selectedCourseId })">Create Lesson</a>
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped lessons-table">
+                <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>Lesson</th>
+                        <th>Level</th>
+                        <th>Last Updated</th>
+                        <th style="width: 310px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var l in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="lesson-title">@(l.Course != null ? l.Course.Title : "-")</div>
+                            </td>
+                            <td>
+                                <div class="lesson-title">@l.Title</div>
+                                <div class="lesson-meta">Lesson ID: @l.LessonId</div>
+                            </td>
+                            <td>
+                                @(string.IsNullOrWhiteSpace(l.DifficultyLevel) ? "-" : l.DifficultyLevel)
+                            </td>
+                            <td>
+                                <span class="lesson-meta">@((l.UpdatedAt ?? l.CreatedAt).ToLocalTime().ToString("dd MMM yyyy HH:mm"))</span>
+                            </td>
+                            <td>
+                                <div class="action-group">
+                                    <a class="btn btn-xs btn-default" href="@Url.Action("Edit", new { id = l.LessonId })">Edit</a>
+                                    <a class="btn btn-xs btn-danger" href="@Url.Action("Delete", new { id = l.LessonId })">Delete</a>
+                                    <a class="btn btn-xs btn-primary" href="@Url.Action("Details", "Lessons", new { id = l.LessonId })">Preview</a>
+                                    <a class="btn btn-xs btn-success" href="@Url.Action("Index", "EducatorExercises", new { lessonId = l.LessonId })">Exercises</a>
+                                    <a class="btn btn-xs btn-info" href="@Url.Action("Index", "EducatorReview", new { lessonId = l.LessonId })">Comment</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

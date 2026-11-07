@@ -1,0 +1,293 @@
+﻿@model FluentMY.ViewModels.SubmissionResultViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Submission Result";
+}
+
+<style>
+    .result-shell {
+        color: #1f2937;
+    }
+
+    .result-hero {
+        border-radius: 22px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 28px;
+        margin-bottom: 24px;
+        box-shadow: 0 16px 35px rgba(13, 110, 253, 0.20);
+    }
+
+        .result-hero h2 {
+            margin: 0 0 8px;
+            font-weight: 800;
+        }
+
+        .result-hero p {
+            margin: 0;
+            color: rgba(255,255,255,0.88);
+        }
+
+    .summary-card,
+    .answer-card,
+    .feedback-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 22px;
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        font-weight: 800;
+        margin-top: 0;
+        margin-bottom: 14px;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 14px;
+    }
+
+    .summary-box {
+        background: #f8fafc;
+        border-radius: 14px;
+        padding: 14px;
+    }
+
+    .summary-label {
+        color: #6b7280;
+        font-size: 13px;
+        margin-bottom: 4px;
+    }
+
+    .summary-value {
+        font-size: 22px;
+        font-weight: 800;
+        color: #111827;
+    }
+
+    .summary-value-small {
+        font-size: 16px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .correct-badge,
+    .incorrect-badge,
+    .reviewed-badge,
+    .pending-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .correct-badge,
+    .reviewed-badge {
+        background: #ecfdf3;
+        color: #15803d;
+    }
+
+    .incorrect-badge {
+        background: #fef2f2;
+        color: #b91c1c;
+    }
+
+    .pending-badge {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .answer-question {
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 10px;
+    }
+
+    .answer-meta {
+        color: #4b5563;
+        margin-bottom: 6px;
+    }
+
+    .feedback-item {
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #eef2f7;
+    }
+
+        .feedback-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+    .feedback-meta {
+        color: #6b7280;
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    .feedback-text {
+        color: #374151;
+        margin-bottom: 0;
+        white-space: pre-line;
+    }
+
+    .result-actions .btn {
+        margin-right: 8px;
+        margin-bottom: 8px;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    .performance-good {
+        color: #15803d;
+    }
+
+    .performance-mid {
+        color: #c2410c;
+    }
+
+    .performance-low {
+        color: #b91c1c;
+    }
+</style>
+
+<div class="result-shell">
+    <div class="result-hero">
+        <h2>Submission Result</h2>
+        <p>@Model.CourseTitle • @Model.LessonTitle</p>
+    </div>
+
+    @if (Model.Percentage >= 80)
+    {
+        <div class="alert alert-success">
+            Great job! You performed very well in this submission.
+        </div>
+    }
+    else if (Model.Percentage >= 50)
+    {
+        <div class="alert alert-info">
+            Good effort. Review the feedback and try to improve on the weaker areas.
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            Keep practicing. Review the lesson and feedback before trying again.
+        </div>
+    }
+
+    <div class="summary-card">
+        <h3 class="section-title">Submission Summary</h3>
+
+        <div class="summary-grid">
+            <div class="summary-box">
+                <div class="summary-label">Attempt</div>
+                <div class="summary-value">@Model.AttemptNumber</div>
+            </div>
+
+            <div class="summary-box">
+                <div class="summary-label">Correct Answers</div>
+                <div class="summary-value">@Model.CorrectAnswers / @Model.TotalQuestions</div>
+            </div>
+
+            <div class="summary-box">
+                <div class="summary-label">Total Score</div>
+                <div class="summary-value">@Model.TotalScore</div>
+            </div>
+
+            <div class="summary-box">
+                <div class="summary-label">Percentage</div>
+                <div class="summary-value @(Model.Percentage >= 80 ? "performance-good" : Model.Percentage >= 50 ? "performance-mid" : "performance-low")">
+                    @Model.Percentage%
+                </div>
+            </div>
+
+            <div class="summary-box">
+                <div class="summary-label">Submitted</div>
+                <div class="summary-value-small">@Model.SubmittedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</div>
+            </div>
+
+            <div class="summary-box">
+                <div class="summary-label">Review Status</div>
+                @if (Model.IsReviewed)
+                {
+                    <div>
+                        <span class="reviewed-badge">Reviewed</span>
+                        @if (Model.ReviewedAt.HasValue)
+                        {
+                            <div class="feedback-meta" style="margin-top:8px;">
+                                @Model.ReviewedAt.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm")
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div>
+                        <span class="pending-badge">Pending</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <h3 class="section-title">Answer Review</h3>
+    @foreach (var item in Model.Answers)
+    {
+        <div class="answer-card">
+            <div class="answer-question">@item.QuestionText</div>
+            <div class="answer-meta"><strong>Your Answer:</strong> @item.SelectedAnswer</div>
+            <div class="answer-meta"><strong>Correct Answer:</strong> @item.CorrectAnswer</div>
+            <div class="answer-meta"><strong>Score:</strong> @item.Score</div>
+
+            @if (item.IsCorrect)
+            {
+                <span class="correct-badge">Correct</span>
+            }
+            else
+            {
+                <span class="incorrect-badge">Incorrect</span>
+            }
+        </div>
+    }
+
+    <div class="feedback-card">
+        <h3 class="section-title">Feedback</h3>
+
+        @if (Model.Feedbacks != null && Model.Feedbacks.Any())
+        {
+            foreach (var feedback in Model.Feedbacks)
+            {
+                <div class="feedback-item">
+                    <div class="feedback-meta">
+                        <strong>@feedback.FeedbackType</strong>
+                        by @feedback.AuthorName on @feedback.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")
+                    </div>
+                    <p class="feedback-text">@feedback.CommentText</p>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info" style="margin-bottom:0;">No feedback available yet.</div>
+        }
+    </div>
+
+    <div class="result-actions">
+        <a class="btn btn-primary" href="@Url.Action("History", "StudentSubmissions")">
+            Submission History
+        </a>
+        <a class="btn btn-default" href="@Url.Action("Details", "Lessons", new { id = Model.LessonId })">
+            Back to Lesson
+        </a>
+        <a class="btn btn-default" href="@Url.Action("Index", "Courses")">
+            Back to Courses
+        </a>
+    </div>
+</div>

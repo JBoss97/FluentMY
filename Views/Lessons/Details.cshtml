@@ -1,0 +1,325 @@
+﻿@using System
+@using System.Linq
+@using System.Web
+@using System.Text.RegularExpressions
+@model FluentMY.ViewModels.LessonDetailsViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = Model.LessonTitle;
+}
+
+@functions {
+    public IHtmlString RenderLessonContent(string content)
+    {
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            return new HtmlString("<p class=\"lesson-content-empty\">No lesson content is available yet.</p>");
+        }
+
+        var trimmed = content.Trim();
+
+        var looksLikeHtml = Regex.IsMatch(
+            trimmed,
+            @"<\s*(p|br|ul|ol|li|div|h1|h2|h3|h4|h5|h6|strong|em|table|blockquote)\b",
+            RegexOptions.IgnoreCase);
+
+        if (looksLikeHtml)
+        {
+            return new HtmlString(trimmed);
+        }
+
+        var normalized = trimmed
+            .Replace("\r\n", "\n")
+            .Replace("\r", "\n");
+
+        normalized = Regex.Replace(normalized, @"\s+(?=\d+\.)", "\n\n");
+
+        var paragraphs = normalized
+            .Split(new[] { "\n\n" }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(p => "<p>" + HttpUtility.HtmlEncode(p.Trim()).Replace("\n", "<br />") + "</p>");
+
+        return new HtmlString(string.Join("", paragraphs));
+    }
+}
+
+<style>
+    .lesson-detail-shell {
+        color: #1f2937;
+    }
+
+    .lesson-detail-hero {
+        border-radius: 24px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 30px;
+        margin-bottom: 24px;
+        box-shadow: 0 18px 36px rgba(13, 110, 253, 0.20);
+    }
+
+    .lesson-breadcrumb {
+        margin-bottom: 10px;
+    }
+
+        .lesson-breadcrumb a {
+            color: #fff;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+    .lesson-detail-hero h2 {
+        margin: 0 0 10px;
+        font-weight: 800;
+    }
+
+    .lesson-detail-hero p {
+        margin: 0;
+        color: rgba(255,255,255,0.88);
+        max-width: 760px;
+    }
+
+    .lesson-level-badge,
+    .lesson-status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-top: 12px;
+        margin-right: 8px;
+    }
+
+    .lesson-level-badge {
+        background: rgba(255,255,255,0.16);
+        color: #fff;
+    }
+
+    .lesson-status-badge.completed {
+        background: #ecfdf3;
+        color: #15803d;
+    }
+
+    .lesson-status-badge.preview {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .lesson-content-card,
+    .lesson-action-card,
+    .lesson-speaking-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        font-weight: 800;
+        margin-top: 0;
+        margin-bottom: 16px;
+        color: #111827;
+    }
+
+    .lesson-content-body {
+        line-height: 1.9;
+        font-size: 17px;
+        color: #374151;
+    }
+
+        .lesson-content-body p {
+            margin: 0 0 18px;
+        }
+
+        .lesson-content-body ul,
+        .lesson-content-body ol {
+            margin: 0 0 18px;
+            padding-left: 24px;
+        }
+
+        .lesson-content-body li {
+            margin-bottom: 8px;
+        }
+
+        .lesson-content-body h1,
+        .lesson-content-body h2,
+        .lesson-content-body h3,
+        .lesson-content-body h4 {
+            color: #111827;
+            font-weight: 800;
+            margin-top: 24px;
+            margin-bottom: 12px;
+        }
+
+        .lesson-content-body strong {
+            color: #111827;
+        }
+
+    .lesson-content-empty {
+        color: #6b7280;
+        font-style: italic;
+        margin-bottom: 0;
+    }
+
+    .lesson-actions .btn,
+    .speaking-actions .btn {
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-weight: 600;
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+
+    .action-note {
+        color: #6b7280;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .speaking-item {
+        padding: 16px;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        margin-bottom: 14px;
+        background: #f8fafc;
+    }
+
+    .speaking-title {
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+
+    .speaking-meta {
+        color: #4b5563;
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="lesson-detail-shell">
+    <div class="lesson-detail-hero">
+        <div class="lesson-breadcrumb">
+            <a href="@Url.Action("Details", "Courses", new { id = Model.CourseId })">
+                @Model.CourseTitle
+            </a>
+        </div>
+
+        <h2>@Model.LessonTitle</h2>
+        <p>Study the lesson content below, then continue with the next learning action.</p>
+
+        @if (!string.IsNullOrWhiteSpace(Model.DifficultyLevel))
+        {
+            <span class="lesson-level-badge">@Model.DifficultyLevel</span>
+        }
+
+        @if (Model.IsCompleted)
+        {
+            <span class="lesson-status-badge completed">Completed</span>
+        }
+
+        @if (Model.IsEducatorPreview)
+        {
+            <span class="lesson-status-badge preview">Educator Preview</span>
+        }
+    </div>
+
+    <div class="lesson-content-card">
+        <h3 class="section-title">Lesson Content</h3>
+        <div class="lesson-content-body">
+            @RenderLessonContent(Model.Content)
+        </div>
+    </div>
+
+    @if (Model.SpeakingExercises != null && Model.SpeakingExercises.Any())
+    {
+        <div class="lesson-speaking-card">
+            <h3 class="section-title">Speaking Practice</h3>
+
+            <p class="action-note" style="margin-bottom:16px;">
+                Practice pronunciation with guided speaking tasks for this lesson.
+            </p>
+
+            @foreach (var speaking in Model.SpeakingExercises)
+            {
+                <div class="speaking-item">
+                    <div class="speaking-title">
+                        @(string.IsNullOrWhiteSpace(speaking.PromptText) ? "Speaking Exercise" : speaking.PromptText)
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(speaking.ReferenceText))
+                    {
+                        <div class="speaking-meta">
+                            <strong>Say this:</strong> @speaking.ReferenceText
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(speaking.SyllableGuide))
+                    {
+                        <div class="speaking-meta">
+                            <strong>Syllables:</strong> @speaking.SyllableGuide
+                        </div>
+                    }
+
+                    <div class="speaking-actions">
+                        <a class="btn btn-info"
+                           href="@Url.Action("Start", "Speaking", new { exerciseId = speaking.ExerciseId, lessonId = Model.LessonId })">
+                            Start Speaking Practice
+                        </a>
+                    </div>
+                </div>
+            }
+
+            <a class="btn btn-default" href="@Url.Action("History", "Speaking", new { lessonId = Model.LessonId })">
+                View Speaking History
+            </a>
+        </div>
+    }
+
+    <div class="lesson-action-card">
+        <h3 class="section-title">Next Action</h3>
+
+        <div class="lesson-actions">
+            <a class="btn btn-default" href="@Url.Action("Details", "Courses", new { id = Model.CourseId })">
+                Back to Course
+            </a>
+
+            @if (Model.IsStudent && Model.IsEnrolled && !Model.IsCompleted)
+            {
+                using (Html.BeginForm("Complete", "Lessons", FormMethod.Post, new { style = "display:inline-block;" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden("id", Model.LessonId)
+
+                    <button type="submit" class="btn btn-success">
+                        Complete Lesson
+                    </button>
+                }
+            }
+
+            @if (Model.IsStudent && Model.IsEnrolled)
+            {
+                <a class="btn btn-warning" href="@Url.Action("Start", "LessonPlay", new { lessonId = Model.LessonId })">
+                    Begin Your Lesson
+                </a>
+            }
+
+            @if (Model.IsStudent && Model.NextLessonId.HasValue && Model.IsCompleted)
+            {
+                <a class="btn btn-default" href="@Url.Action("Details", "Lessons", new { id = Model.NextLessonId.Value })">
+                    Next Lesson
+                </a>
+            }
+        </div>
+
+        <div class="action-note">
+            @if (Model.IsEducatorPreview)
+            {
+                @:You are previewing this lesson as an educator.
+            }
+            else if (Model.IsStudent)
+            {
+                @:Students can study the lesson content, take the quiz, use speaking practice, and continue course progress.
+            }
+        </div>
+    </div>
+</div>

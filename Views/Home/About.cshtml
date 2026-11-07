@@ -1,0 +1,371 @@
+@{
+    ViewBag.Title = "About Us";
+    var subtitle = string.IsNullOrWhiteSpace(ViewBag.Message as string)
+        ? "FluentMY helps learners build practical language skills through structured lessons, speaking practice, game-based activities, and a more relevant Malaysian learning context."
+        : ViewBag.Message;
+}
+
+<style>
+    .about-shell {
+        color: #1f2937;
+    }
+
+    .hero {
+        background: linear-gradient(135deg, #eaf3ff 0%, #ffffff 100%);
+        border-radius: 24px;
+        padding: 56px 30px;
+        margin-top: 12px;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 16px 36px rgba(12, 38, 76, 0.08);
+    }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 180px;
+            height: 180px;
+            background: rgba(13, 110, 253, 0.08);
+            border-radius: 50%;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            bottom: -50px;
+            left: -40px;
+            width: 170px;
+            height: 170px;
+            background: rgba(25, 135, 84, 0.08);
+            border-radius: 50%;
+        }
+
+    .hero-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-badge {
+        display: inline-block;
+        background: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 8px 14px;
+        border-radius: 999px;
+        margin-bottom: 16px;
+    }
+
+    .hero h1 {
+        font-size: 2.8rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: #0f172a;
+        margin-bottom: 14px;
+    }
+
+    .hero p.lead {
+        font-size: 1.08rem;
+        color: #4b5563;
+        line-height: 1.8;
+        max-width: 760px;
+        margin-bottom: 0;
+    }
+
+    .info-card,
+    .feature-card,
+    .stat-card,
+    .cta-card {
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+        border: 1px solid #eef2f7;
+        height: 100%;
+    }
+
+    .info-card,
+    .cta-card {
+        padding: 28px;
+    }
+
+    .feature-card,
+    .stat-card {
+        padding: 24px;
+    }
+
+    .section-heading {
+        font-size: 1.45rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 14px;
+    }
+
+    .section-text {
+        color: #4b5563;
+        line-height: 1.8;
+        margin-bottom: 0;
+    }
+
+    .mini-label {
+        display: inline-block;
+        color: #0d6efd;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.78rem;
+        margin-bottom: 10px;
+    }
+
+    .stat-card {
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #0d6efd;
+        line-height: 1;
+        margin-bottom: 10px;
+    }
+
+    .stat-caption {
+        color: #4b5563;
+        margin-bottom: 0;
+        line-height: 1.7;
+    }
+
+    .feature-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }
+
+    .feature-card h3 {
+        font-size: 1.08rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 10px;
+    }
+
+    .feature-card p {
+        color: #4b5563;
+        line-height: 1.75;
+        margin-bottom: 0;
+    }
+
+    .cta-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f7fbff 100%);
+    }
+
+        .cta-card h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 12px;
+        }
+
+        .cta-card p {
+            color: #4b5563;
+            line-height: 1.8;
+            margin-bottom: 0;
+        }
+
+    .btn-primary-soft,
+    .btn-outline-soft {
+        display: inline-block;
+        padding: 12px 22px;
+        border-radius: 999px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-primary-soft {
+        background: #0d6efd;
+        color: #ffffff;
+        margin-right: 10px;
+    }
+
+        .btn-primary-soft:hover {
+            background: #0b5ed7;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+    .btn-outline-soft {
+        background: #eef4ff;
+        color: #0d6efd;
+    }
+
+        .btn-outline-soft:hover {
+            background: #dbe9ff;
+            color: #0b5ed7;
+            text-decoration: none;
+        }
+
+    @@media (max-width: 991.98px) {
+        .hero h1 {
+            font-size: 2.35rem;
+        }
+    }
+
+    @@media (max-width: 767.98px) {
+        .hero {
+            padding: 40px 22px;
+            border-radius: 20px;
+        }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+        .info-card,
+        .feature-card,
+        .stat-card,
+        .cta-card {
+            border-radius: 18px;
+        }
+
+        .btn-primary-soft,
+        .btn-outline-soft {
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin-right: 0;
+        }
+
+        .btn-outline-soft {
+            margin-top: 12px;
+        }
+    }
+</style>
+
+<main class="about-shell">
+    <section class="hero" aria-labelledby="aboutTitle">
+        <div class="hero-content">
+            <span class="hero-badge">About FluentMY</span>
+            <h1 id="aboutTitle">A modern language learning platform built for practical communication</h1>
+            <p class="lead">@subtitle</p>
+        </div>
+    </section>
+
+    <section class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-value">3</div>
+                <p class="stat-caption">Core roles supported across the platform: student, educator, and admin.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-value">4</div>
+                <p class="stat-caption">Main learning strengths: structured lessons, speaking practice, game play, and progress tracking.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-value">24/7</div>
+                <p class="stat-caption">Web-based access that allows learners to study anytime and anywhere.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <article class="info-card">
+                <div class="mini-label">Who we are</div>
+                <h2 class="section-heading">Designed for meaningful language growth</h2>
+                <p class="section-text">
+                    FluentMY is a web-based language learning platform created to help learners improve real communication skills in a clearer and more engaging environment. Instead of focusing only on memorization, the platform supports guided learning through lessons, quizzes, speaking activities, and interactive game-style practice that help learners use language more actively.
+                </p>
+            </article>
+        </div>
+        <div class="col-lg-6">
+            <article class="info-card">
+                <div class="mini-label">Why it matters</div>
+                <h2 class="section-heading">Built with Malaysian relevance in mind</h2>
+                <p class="section-text">
+                    FluentMY is designed to feel more relatable for local users by using learning flows, examples, and content that better fit the Malaysian context. This makes the platform more approachable while allowing students, educators, and administrators to work together in one connected system.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <section class="row g-4 mb-4">
+        <div class="col-md-6 col-xl-3">
+            <article class="feature-card">
+                <div class="feature-icon">01</div>
+                <h3>Structured learning journey</h3>
+                <p>Lessons are organized to guide learners from basic understanding to more confident language use step by step.</p>
+            </article>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <article class="feature-card">
+                <div class="feature-icon">02</div>
+                <h3>Interactive practice modes</h3>
+                <p>Users can strengthen learning through quizzes, speaking activities, and game play sessions that make practice more engaging.</p>
+            </article>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <article class="feature-card">
+                <div class="feature-icon">03</div>
+                <h3>Educator and admin support</h3>
+                <p>Educators can manage lessons and monitor learner performance, while admins oversee platform activity and system management.</p>
+            </article>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <article class="feature-card">
+                <div class="feature-icon">04</div>
+                <h3>Visible learner progress</h3>
+                <p>Progress tracking helps learners stay motivated and gives the platform clearer insight into performance and improvement.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <article class="info-card">
+                <div class="mini-label">Our goal</div>
+                <h2 class="section-heading">Make language learning more practical and engaging</h2>
+                <p class="section-text">
+                    FluentMY aims to create a learning experience that is more useful, motivating, and accessible for modern learners. By combining structured content, localized relevance, interactive features, and role-based support, the platform encourages stronger participation and more meaningful learning outcomes.
+                </p>
+            </article>
+        </div>
+        <div class="col-lg-6">
+            <article class="info-card">
+                <div class="mini-label">What learners gain</div>
+                <h2 class="section-heading">A clearer path from practice to confidence</h2>
+                <p class="section-text">
+                    Learners can study through a cleaner digital experience, review their history, track their progress, and gradually build confidence in using the language. The platform is designed not only to deliver content, but also to help learners stay engaged throughout the learning journey.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <section class="cta-card mb-2">
+        <div class="row align-items-center g-3">
+            <div class="col-lg-8">
+                <div class="mini-label">Next step</div>
+                <h2>Explore FluentMY and connect with the team</h2>
+                <p>
+                    Whether you are learning independently, teaching a class, or managing the system, FluentMY is designed to make language learning more structured, practical, and engaging.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="@Url.Action("Index", "Courses")" class="btn-primary-soft">Explore Courses</a>
+                <a href="@Url.Action("Contact", "Home")" class="btn-outline-soft">Contact Us</a>
+            </div>
+        </div>
+    </section>
+</main>

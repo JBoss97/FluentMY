@@ -1,0 +1,33 @@
+﻿@model IEnumerable<FluentMY.Models.AdminAuditLog>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Audit Logs";
+}
+
+<h2>Audit Logs</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Admin</th>
+            <th>Action</th>
+            <th>Entity Type</th>
+            <th>Entity</th>
+            <th>Details</th>
+            <th>Created</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.AdminUserName</td>
+                <td>@item.ActionType</td>
+                <td>@item.EntityType</td>
+                <td>@item.EntityDisplayName</td>
+                <td>@item.Details</td>
+                <td>@item.CreatedAtUtc.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+            </tr>
+        }
+    </tbody>
+</table>

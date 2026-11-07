@@ -1,0 +1,467 @@
+@model FluentMY.ViewModels.ContactEnquiryViewModel
+@{
+    ViewBag.Title = "Contact Us";
+    var subtitle = string.IsNullOrWhiteSpace(ViewBag.Message as string)
+        ? "Reach out for learner support, educator enquiries, platform guidance, or general collaboration."
+        : ViewBag.Message;
+}
+
+<style>
+    .contact-shell {
+        color: #1f2937;
+    }
+
+    .hero {
+        background: linear-gradient(135deg, #eaf3ff 0%, #ffffff 100%);
+        border-radius: 24px;
+        padding: 56px 30px;
+        margin-top: 12px;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 16px 36px rgba(12, 38, 76, 0.08);
+    }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 180px;
+            height: 180px;
+            background: rgba(13, 110, 253, 0.08);
+            border-radius: 50%;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            bottom: -50px;
+            left: -40px;
+            width: 170px;
+            height: 170px;
+            background: rgba(25, 135, 84, 0.08);
+            border-radius: 50%;
+        }
+
+    .hero-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-badge {
+        display: inline-block;
+        background: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 8px 14px;
+        border-radius: 999px;
+        margin-bottom: 16px;
+    }
+
+    .hero h1 {
+        font-size: 2.8rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: #0f172a;
+        margin-bottom: 14px;
+    }
+
+    .hero p.lead {
+        font-size: 1.08rem;
+        color: #4b5563;
+        line-height: 1.8;
+        max-width: 760px;
+        margin-bottom: 0;
+    }
+
+    .info-card,
+    .form-card,
+    .support-card {
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+        border: 1px solid #eef2f7;
+        height: 100%;
+    }
+
+    .info-card,
+    .form-card {
+        padding: 28px;
+    }
+
+    .support-card {
+        padding: 22px;
+        text-align: center;
+    }
+
+    .mini-label {
+        display: inline-block;
+        color: #0d6efd;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.78rem;
+        margin-bottom: 10px;
+    }
+
+    .section-heading {
+        font-size: 1.45rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 14px;
+    }
+
+    .section-text {
+        color: #4b5563;
+        line-height: 1.8;
+        margin-bottom: 0;
+    }
+
+    .contact-list {
+        list-style: none;
+        padding: 0;
+        margin: 18px 0 0;
+    }
+
+    .contact-item {
+        display: flex;
+        gap: 14px;
+        padding: 16px 0;
+        border-bottom: 1px solid #eef2f7;
+    }
+
+        .contact-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+    .contact-badge {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        border-radius: 14px;
+        background: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+    }
+
+    .contact-label {
+        font-size: 0.92rem;
+        color: #6b7280;
+        margin-bottom: 4px;
+    }
+
+    .contact-value,
+    .contact-value a {
+        color: #111827;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+        .contact-value a:hover {
+            color: #0d6efd;
+        }
+
+    .contact-note {
+        color: #6b7280;
+        font-size: 0.94rem;
+        margin-top: 4px;
+        line-height: 1.7;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 18px;
+    }
+
+    .form-group {
+        margin-bottom: 0;
+    }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+
+    .form-control-custom {
+        width: 100%;
+        border: 1px solid #d1d5db;
+        border-radius: 14px;
+        padding: 12px 14px;
+        font-size: 0.98rem;
+        color: #111827;
+        background: #ffffff;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .form-control-custom:focus {
+            outline: none;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.12);
+        }
+
+    textarea.form-control-custom {
+        resize: vertical;
+        min-height: 130px;
+    }
+
+    .btn-primary-soft {
+        display: inline-block;
+        margin-top: 18px;
+        background: #0d6efd;
+        color: #ffffff;
+        border: none;
+        border-radius: 999px;
+        padding: 12px 22px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+        .btn-primary-soft:hover {
+            background: #0b5ed7;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+    .validation-error {
+        color: #dc2626;
+        font-size: 0.88rem;
+        margin-top: 6px;
+        display: block;
+    }
+
+    .validation-summary-errors {
+        margin-top: 18px;
+        margin-bottom: 0;
+        padding-left: 18px;
+        color: #b91c1c;
+    }
+
+    .support-card h3 {
+        font-size: 1.08rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .support-card p {
+        color: #4b5563;
+        line-height: 1.7;
+        margin-bottom: 0;
+    }
+
+    @@media (max-width: 991.98px) {
+        .hero h1 {
+            font-size: 2.35rem;
+        }
+    }
+
+    @@media (max-width: 767.98px) {
+        .hero {
+            padding: 40px 22px;
+            border-radius: 20px;
+        }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .info-card,
+        .form-card,
+        .support-card {
+            border-radius: 18px;
+        }
+    }
+</style>
+
+<main class="contact-shell">
+    <section class="hero" aria-labelledby="contactTitle">
+        <div class="hero-content">
+            <span class="hero-badge">Contact FluentMY</span>
+            <h1 id="contactTitle">We are here to help you move forward</h1>
+            <p class="lead">@subtitle</p>
+        </div>
+    </section>
+
+    <section class="row g-4 mb-4">
+        <div class="col-lg-5">
+            <article class="info-card">
+                <div class="mini-label">Get in touch</div>
+                <h2 class="section-heading">Talk to the FluentMY team</h2>
+                <p class="section-text">
+                    Contact us for learner support, platform questions, educator use cases, or administrative matters. Your enquiry will be submitted to the admin team for review.
+                </p>
+
+                <ul class="contact-list">
+                    <li class="contact-item">
+                        <div class="contact-badge">EM</div>
+                        <div>
+                            <div class="contact-label">Email</div>
+                            <div class="contact-value"><a href="mailto:support@fluentmy.com">support@fluentmy.com</a></div>
+                            <div class="contact-note">For general enquiries, learner support, and technical assistance.</div>
+                        </div>
+                    </li>
+                    <li class="contact-item">
+                        <div class="contact-badge">PH</div>
+                        <div>
+                            <div class="contact-label">Phone</div>
+                            <div class="contact-value"><a href="tel:+60312345678">+60 3-1234 5678</a></div>
+                            <div class="contact-note">Use this for urgent matters during normal working hours.</div>
+                        </div>
+                    </li>
+                    <li class="contact-item">
+                        <div class="contact-badge">OF</div>
+                        <div>
+                            <div class="contact-label">Office</div>
+                            <div class="contact-value">Kuala Lumpur, Malaysia</div>
+                            <div class="contact-note">Main administrative and support location for the platform.</div>
+                        </div>
+                    </li>
+                    <li class="contact-item">
+                        <div class="contact-badge">HR</div>
+                        <div>
+                            <div class="contact-label">Working Hours</div>
+                            <div class="contact-value">Monday - Friday, 9:00 AM - 5:00 PM</div>
+                            <div class="contact-note">Weekend and holiday responses may take a little longer.</div>
+                        </div>
+                    </li>
+                </ul>
+            </article>
+        </div>
+
+        <div class="col-lg-7">
+            <article class="form-card">
+                <div class="mini-label">Send a message</div>
+                <h2 class="section-heading">Submit your enquiry</h2>
+                <p class="section-text">Fill in the form below and your message will be sent to the admin team.</p>
+
+                @if (TempData["ContactSuccess"] != null)
+                {
+                    <div class="alert alert-success" style="border-radius:14px; margin-top:18px; margin-bottom:0;">
+                        @TempData["ContactSuccess"]
+                    </div>
+                }
+
+                @using (Html.BeginForm("Contact", "Home", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    @Html.ValidationSummary(true, "", new { @class = "validation-summary-errors" })
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.FullName, new { @class = "form-label", @for = "fullName" })
+                            @Html.TextBoxFor(m => m.FullName, new
+                            {
+                                id = "fullName",
+                                @class = "form-control-custom",
+                                placeholder = "Enter your full name"
+                            })
+                            @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "validation-error" })
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Email, new { @class = "form-label", @for = "email" })
+                            @Html.TextBoxFor(m => m.Email, new
+                            {
+                                id = "email",
+                                type = "email",
+                                @class = "form-control-custom",
+                                placeholder = "Enter your email address"
+                            })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "validation-error" })
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Subject, new { @class = "form-label", @for = "subject" })
+                            @Html.TextBoxFor(m => m.Subject, new
+                            {
+                                id = "subject",
+                                @class = "form-control-custom",
+                                placeholder = "Enter the subject"
+                            })
+                            @Html.ValidationMessageFor(m => m.Subject, "", new { @class = "validation-error" })
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Role, new { @class = "form-label", @for = "role" })
+                            @Html.DropDownListFor(
+                                m => m.Role,
+                                new SelectList(new[]
+                                {
+                                    "Student",
+                                    "Educator",
+                                    "Admin",
+                                    "Visitor"
+                                }),
+                                "Select role",
+                                new
+                                {
+                                    id = "role",
+                                    @class = "form-control-custom"
+                                })
+                            @Html.ValidationMessageFor(m => m.Role, "", new { @class = "validation-error" })
+                        </div>
+
+                        <div class="form-group full">
+                            @Html.LabelFor(m => m.Message, new { @class = "form-label", @for = "message" })
+                            @Html.TextAreaFor(m => m.Message, new
+                            {
+                                id = "message",
+                                @class = "form-control-custom",
+                                placeholder = "Write your message here",
+                                rows = "6"
+                            })
+                            @Html.ValidationMessageFor(m => m.Message, "", new { @class = "validation-error" })
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary-soft">Submit Enquiry</button>
+                }
+            </article>
+        </div>
+    </section>
+
+    <section class="row g-4 mb-2">
+        <div class="col-md-4">
+            <article class="support-card">
+                <h3>Learner Support</h3>
+                <p>Get help with account access, course navigation, and learning progress questions.</p>
+            </article>
+        </div>
+        <div class="col-md-4">
+            <article class="support-card">
+                <h3>Educator Enquiries</h3>
+                <p>Ask about classroom usage, content handling, and teaching support on the platform.</p>
+            </article>
+        </div>
+        <div class="col-md-4">
+            <article class="support-card">
+                <h3>Admin Assistance</h3>
+                <p>Reach out about management functions, system setup, or operational concerns.</p>
+            </article>
+        </div>
+    </section>
+</main>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

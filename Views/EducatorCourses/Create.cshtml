@@ -1,0 +1,120 @@
+﻿@model FluentMY.ViewModels.EducatorCourseViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Create Course";
+}
+
+<style>
+    .course-form-shell {
+        color: #1f2937;
+    }
+
+    .course-form-hero {
+        border-radius: 22px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 28px;
+        margin-bottom: 24px;
+        box-shadow: 0 16px 35px rgba(13, 110, 253, 0.20);
+    }
+
+        .course-form-hero h2 {
+            margin: 0 0 8px;
+            font-weight: 800;
+        }
+
+        .course-form-hero p {
+            margin: 0;
+            color: rgba(255,255,255,0.88);
+        }
+
+    .course-form-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15,23,42,0.06);
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        padding: 24px;
+    }
+
+        .course-form-card .form-group {
+            margin-bottom: 18px;
+        }
+
+        .course-form-card label {
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .course-form-card .form-control {
+            border-radius: 12px;
+            min-height: 44px;
+        }
+
+    .course-form-actions .btn {
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-weight: 600;
+        margin-right: 8px;
+    }
+
+    .form-help {
+        color: #6b7280;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+</style>
+
+<div class="course-form-shell">
+    <div class="course-form-hero">
+        <h2>Create Course</h2>
+        <p>Set up a new course that you will manage as an educator.</p>
+    </div>
+
+    <div class="course-form-card">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+        }
+
+        @using (Html.BeginForm("Create", "EducatorCourses", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Title)
+                @Html.TextBoxFor(m => m.Title, new { @class = "form-control", placeholder = "Example: Spoken English Essentials" })
+                @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger" })
+                <div class="form-help">Choose a clear title that helps learners understand the course focus.</div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Language)
+                @Html.TextBoxFor(m => m.Language, new { @class = "form-control", placeholder = "Example: English" })
+                @Html.ValidationMessageFor(m => m.Language, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Level)
+                @Html.TextBoxFor(m => m.Level, new { @class = "form-control", placeholder = "Example: Beginner / A1 / Intermediate" })
+                @Html.ValidationMessageFor(m => m.Level, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.EstimatedDuration)
+                @Html.TextBoxFor(m => m.EstimatedDuration, new { @class = "form-control", placeholder = "Example: 2 weeks" })
+                @Html.ValidationMessageFor(m => m.EstimatedDuration, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Description)
+                @Html.TextAreaFor(m => m.Description, new { @class = "form-control", rows = "5", placeholder = "Briefly describe what learners will learn in this course." })
+                @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="course-form-actions">
+                <button class="btn btn-primary" type="submit">Save Course</button>
+                <a class="btn btn-default" href="@Url.Action("Index", "EducatorCourses")">Cancel</a>
+            </div>
+        }
+    </div>
+</div>

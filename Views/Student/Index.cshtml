@@ -1,0 +1,431 @@
+﻿@model FluentMY.ViewModels.StudentDashboardViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Student Dashboard";
+
+    var displayName = string.IsNullOrWhiteSpace(Model.FullNameOrEmail) ? "Learner" : Model.FullNameOrEmail;
+    var overallProgressWidth = "width:" + Model.OverallProgressPercent + "%;";
+    var overallProgressWhiteStyle = "width:" + Model.OverallProgressPercent + "%; background:#ffffff;";
+}
+
+<style>
+    .student-shell {
+        color: #1f2937;
+    }
+
+    .student-hero {
+        border-radius: 24px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+        color: #fff;
+        padding: 32px;
+        margin-bottom: 24px;
+        box-shadow: 0 18px 36px rgba(13, 110, 253, 0.20);
+    }
+
+    .student-kicker {
+        display: inline-block;
+        background: rgba(255,255,255,0.15);
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+    }
+
+    .student-hero h2 {
+        margin-top: 8px;
+        margin-bottom: 10px;
+        font-weight: 800;
+    }
+
+    .student-hero p {
+        color: rgba(255,255,255,0.9);
+        max-width: 720px;
+        margin-bottom: 18px;
+    }
+
+    .hero-actions .btn {
+        margin-right: 10px;
+        margin-bottom: 10px;
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-weight: 600;
+    }
+
+    .hero-summary {
+        background: rgba(255,255,255,0.12);
+        border: 1px solid rgba(255,255,255,0.16);
+        border-radius: 18px;
+        padding: 18px;
+        margin-top: 8px;
+    }
+
+        .hero-summary .summary-label {
+            font-size: 13px;
+            color: rgba(255,255,255,0.75);
+            margin-bottom: 6px;
+        }
+
+        .hero-summary .summary-value {
+            font-size: 30px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+    .dashboard-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15, 23, 42, 0.06);
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+        padding: 20px;
+        margin-bottom: 20px;
+        height: 100%;
+    }
+
+        .dashboard-card h3,
+        .dashboard-card h4 {
+            font-weight: 800;
+            margin-top: 0;
+        }
+
+    .dashboard-muted {
+        color: #6b7280;
+    }
+
+    .stats-card {
+        text-align: center;
+        padding: 22px 16px;
+    }
+
+    .stats-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #eff6ff;
+        color: #0d6efd;
+        font-size: 22px;
+        font-weight: 800;
+        margin-bottom: 12px;
+    }
+
+    .stats-number {
+        font-size: 30px;
+        font-weight: 800;
+        color: #0d6efd;
+        margin-bottom: 4px;
+    }
+
+    .stats-label {
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .progress-wrap {
+        margin-top: 12px;
+    }
+
+    .progress-custom {
+        width: 100%;
+        height: 12px;
+        border-radius: 999px;
+        background: #e9eef6;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b4db7 100%);
+    }
+
+    .section-title {
+        font-weight: 800;
+        margin-top: 8px;
+        margin-bottom: 16px;
+    }
+
+    .course-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(15, 23, 42, 0.06);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+        overflow: hidden;
+        margin-bottom: 20px;
+        height: 100%;
+    }
+
+    .course-top {
+        background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+        padding: 16px 18px;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+    }
+
+    .course-title {
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 4px;
+        color: #111827;
+    }
+
+    .course-meta {
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .course-body {
+        padding: 18px;
+    }
+
+    .course-status {
+        margin-bottom: 12px;
+    }
+
+    .status-good,
+    .status-pending {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .status-good {
+        background: #ecfdf3;
+        color: #15803d;
+    }
+
+    .status-pending {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .course-actions .btn {
+        margin-right: 8px;
+        margin-bottom: 8px;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    .empty-state {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px dashed rgba(15, 23, 42, 0.14);
+        padding: 32px;
+        text-align: center;
+        color: #6b7280;
+    }
+
+        .empty-state h4 {
+            font-weight: 800;
+            color: #111827;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+    .resume-card {
+        border-left: 5px solid #0d6efd;
+    }
+
+    .resume-title {
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+
+    @@media (max-width: 991px) {
+        .student-hero {
+            padding: 24px;
+        }
+    }
+</style>
+
+<div class="student-shell">
+    <div class="student-hero">
+        <div class="row">
+            <div class="col-md-8">
+                <span class="student-kicker">Student Dashboard</span>
+                <h2>Welcome back, @displayName</h2>
+                <p>
+                    Keep building your language skills through lessons, quizzes, and progress tracking.
+                    Everything you need for your learning journey is organized here.
+                </p>
+
+                <div class="hero-actions">
+                    @if (Model.ContinueLessonId.HasValue)
+                    {
+                        <a class="btn btn-light" href="@Url.Action("Details", "Lessons", new { id = Model.ContinueLessonId.Value })">
+                            Continue Learning
+                        </a>
+                    }
+
+                    <a class="btn btn-default" href="@Url.Action("Index", "Courses")">Browse Courses</a>
+                    <a class="btn btn-default" href="@Url.Action("History", "StudentSubmissions")">Learning History</a>
+                    <a class="btn btn-default" href="@Url.Action("History", "Speaking")">Speaking History</a>
+                    <a class="btn btn-default" href="@Url.Action("EditProfile", "Manage")">Edit Profile</a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="hero-summary">
+                    <div class="summary-label">Overall Progress</div>
+                    <div class="summary-value">@Model.OverallProgressPercent%</div>
+                    <div style="color: rgba(255,255,255,0.82);">
+                        @Model.CompletedLessonsInEnrolledCourses / @Model.TotalLessonsInEnrolledCourses lessons completed
+                    </div>
+
+                    <div class="progress-wrap" style="margin-top:14px;">
+                        <div class="progress-custom" style="background: rgba(255,255,255,0.18);">
+                            <div class="progress-fill" style="@overallProgressWhiteStyle"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="dashboard-card resume-card">
+                <h4>Continue Learning</h4>
+
+                @if (Model.ContinueLessonId.HasValue)
+                {
+                    <div class="dashboard-muted" style="margin-bottom:8px;">@Model.ContinueCourseTitle</div>
+                    <div class="resume-title">@Model.ContinueLessonTitle</div>
+                    <a class="btn btn-primary" href="@Url.Action("Details", "Lessons", new { id = Model.ContinueLessonId.Value })">
+                        Resume Lesson
+                    </a>
+                }
+                else
+                {
+                    <p class="dashboard-muted">No lesson is currently in progress.</p>
+                    <a class="btn btn-default" href="@Url.Action("Index", "Courses")">Start a Course</a>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="dashboard-card stats-card">
+                <div class="stats-icon">📚</div>
+                <div class="stats-number">@Model.EnrolledCoursesCount</div>
+                <div class="stats-label">Enrolled Courses</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="dashboard-card stats-card">
+                <div class="stats-icon">✅</div>
+                <div class="stats-number">@Model.CompletedCoursesCount</div>
+                <div class="stats-label">Completed Courses</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-card">
+        <h3 class="section-title">Learning Progress</h3>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <div class="stats-icon">📈</div>
+                    <div class="stats-number">@Model.OverallProgressPercent%</div>
+                    <div class="stats-label">Overall Completion</div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <div class="stats-icon">📝</div>
+                    <div class="stats-number">@Model.CompletedLessonsInEnrolledCourses</div>
+                    <div class="stats-label">Lessons Completed</div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <div class="stats-icon">📖</div>
+                    <div class="stats-number">@Model.TotalLessonsInEnrolledCourses</div>
+                    <div class="stats-label">Total Lessons</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="progress-wrap">
+            <div class="progress-custom">
+                <div class="progress-fill" style="@overallProgressWidth"></div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="section-title">My Courses</h3>
+
+    @if (Model.MyCourses == null || !Model.MyCourses.Any())
+    {
+        <div class="empty-state">
+            <h4>No enrolled courses yet</h4>
+            <p>Start with a course to begin building your learning progress and dashboard activity.</p>
+            <a class="btn btn-primary" href="@Url.Action("Index", "Courses")">Explore Courses</a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var course in Model.MyCourses)
+            {
+                var courseProgressWidth = "width:" + course.ProgressPercent + "%;";
+
+                <div class="col-md-4">
+                    <div class="course-card">
+                        <div class="course-top">
+                            <div class="course-title">@course.Title</div>
+                            <div class="course-meta">
+                                @course.Language
+                                @if (!string.IsNullOrWhiteSpace(course.Level))
+                                {
+                                    @: • @course.Level
+                                }
+                            </div>
+                        </div>
+
+                        <div class="course-body">
+                            <div class="course-status">
+                                @if (course.ProgressPercent >= 100)
+                                {
+                                    <span class="status-good">Completed</span>
+                                }
+                                else
+                                {
+                                    <span class="status-pending">In Progress</span>
+                                }
+                            </div>
+
+                            <div class="dashboard-muted" style="margin-bottom:8px;">Course Progress</div>
+                            <div style="font-weight:800; margin-bottom:10px;">@course.ProgressPercent%</div>
+
+                            <div class="progress-custom" style="margin-bottom:16px;">
+                                <div class="progress-fill" style="@courseProgressWidth"></div>
+                            </div>
+
+                            <div class="course-actions">
+                                <a class="btn btn-default btn-sm" href="@Url.Action("Details", "Courses", new { id = course.CourseId })">
+                                    View Course
+                                </a>
+
+                                @if (course.ContinueLessonId.HasValue)
+                                {
+                                    <a class="btn btn-primary btn-sm" href="@Url.Action("Details", "Lessons", new { id = course.ContinueLessonId.Value })">
+                                        Continue
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
