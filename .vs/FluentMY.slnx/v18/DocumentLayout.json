@@ -7,12 +7,12 @@
       "RelativeMoniker": "D:0:0:{3FE62BD1-AD75-47BC-8484-8DD106DD948F}|FluentMY.csproj|solutionrelative:web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{3FE62BD1-AD75-47BC-8484-8DD106DD948F}|FluentMY.csproj|C:\\Users\\ligua\\source\\repos\\FluentMY\\views\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
-      "RelativeMoniker": "D:0:0:{3FE62BD1-AD75-47BC-8484-8DD106DD948F}|FluentMY.csproj|solutionrelative:views\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{3FE62BD1-AD75-47BC-8484-8DD106DD948F}|FluentMY.csproj|C:\\Users\\ligua\\source\\repos\\FluentMY\\controllers\\lessonplaycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{3FE62BD1-AD75-47BC-8484-8DD106DD948F}|FluentMY.csproj|solutionrelative:controllers\\lessonplaycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3FE62BD1-AD75-47BC-8484-8DD106DD948F}|FluentMY.csproj|C:\\Users\\ligua\\source\\repos\\FluentMY\\views\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{3FE62BD1-AD75-47BC-8484-8DD106DD948F}|FluentMY.csproj|solutionrelative:views\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{3FE62BD1-AD75-47BC-8484-8DD106DD948F}|FluentMY.csproj|C:\\Users\\ligua\\source\\repos\\FluentMY\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -62,7 +62,7 @@
             },
             {
               "$type": "Bookmark",
-              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
             },
             {
               "$type": "Document",
@@ -79,7 +79,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "LessonPlayController.cs",
               "DocumentMoniker": "C:\\Users\\ligua\\source\\repos\\FluentMY\\Controllers\\LessonPlayController.cs",
               "RelativeDocumentMoniker": "Controllers\\LessonPlayController.cs",
@@ -87,7 +87,8 @@
               "RelativeToolTip": "Controllers\\LessonPlayController.cs",
               "ViewState": "AgIAAGcAAAAAAAAAAAAAAEkAAAAnAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-03T14:09:13.956Z"
+              "WhenOpened": "2026-04-03T14:09:13.956Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -103,7 +104,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Web.config",
               "DocumentMoniker": "C:\\Users\\ligua\\source\\repos\\FluentMY\\Views\\Web.config",
               "RelativeDocumentMoniker": "Views\\Web.config",
